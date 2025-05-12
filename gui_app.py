@@ -51,7 +51,7 @@ with st.sidebar:
 			thickness=thickness
 		)
 
-		# export_paper_base(box, CoverSide.EXTERNAL)
+		
 		# export_paper_base(box, CoverSide.INTERNAL)
 		# export_paper_top_lose(box, CoverSide.EXTERNAL)
 		# export_paper_top_lose(box, CoverSide.INTERNAL)
@@ -64,6 +64,7 @@ with st.sidebar:
 		cardboard_top_lose_bundle = export_cardboard_top_lose(box, returning=True)
 		cardboard_top_magnet_bundle = export_cardboard_top_magnet(box, returning=True)
 		cardboard_base_bundle = export_cardboard_base(box, returning=True)
+		paper_base_external_bundle = export_paper_base(box, CoverSide.EXTERNAL, returning=True)
 
 		files = {
 			paper_top_book_external_bundle.file_name: paper_top_book_external_bundle.svg_string,
@@ -73,7 +74,8 @@ with st.sidebar:
 			cardboard_top_book_bundle.file_name: cardboard_top_book_bundle.svg_string,
 			cardboard_top_lose_bundle.file_name: cardboard_top_lose_bundle.svg_string,
 			cardboard_top_magnet_bundle.file_name: cardboard_top_magnet_bundle.svg_string,
-			cardboard_base_bundle.file_name: cardboard_base_bundle.svg_string
+			cardboard_base_bundle.file_name: cardboard_base_bundle.svg_string,
+			paper_base_external_bundle.file_name: paper_base_external_bundle.svg_string
 		}
 
 		zip_buffer = io.BytesIO()
@@ -91,7 +93,6 @@ with st.sidebar:
 		)
 
 st.title("Touché | Caixas Cartonadas")
-#st.header("📐 Renderização em tempo real")
 st.subheader(f"(L){width:.1f}cm × (A){height:.1f}cm × (P){depth:.1f}cm, (E){thickness:.1f}mm")
 st.subheader("📦 Papelão")
 
