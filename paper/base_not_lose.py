@@ -64,7 +64,7 @@ def export(
 		)
 
 		path = dwg.path(
-			stroke="blue",
+			stroke="navy",
 			fill="none",
 			stroke_width='0.1'
 		)

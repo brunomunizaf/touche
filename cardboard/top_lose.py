@@ -160,23 +160,20 @@ def export(
 	box: Box,
 	returning=False
 ):
-	W = cm_to_mm(box.width)
-	H = cm_to_mm(box.height)
-	D = cm_to_mm(box.depth)
+	W = cm_to_mm(box.width) + get_clearance(box.thickness)
+	H = cm_to_mm(box.height) + get_clearance(box.thickness)
+	D = calculate_top_depth(cm_to_mm(box.depth))
 	T = box.thickness
 
-	top_depth = calculate_top_depth(D)
-	clearance = get_clearance(T)
-
-	x0 = top_depth
+	x0 = D
 	xL = 0
-	x1 = x0 + W + clearance
-	xR = x1 + top_depth
+	x1 = x0 + W
+	xR = x1 + D
 
-	y0 = top_depth
+	y0 = D
 	yB = 0
-	y1 = y0 + H + clearance
-	yT = y1 + top_depth
+	y1 = y0 + H
+	yT = y1 + D
 
 	total_width = xR
 	total_height = yT
