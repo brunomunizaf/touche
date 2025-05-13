@@ -115,7 +115,7 @@ def export(
 		dwg.add(path)
 
 	else:
-		print('TODO: Revestimento interno da base')
+		raise NotImplementedError("Exportação de revestimento interno da base ainda não foi implementada.")
 		
 	if returning:
 		buffer = io.StringIO()
