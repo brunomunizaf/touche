@@ -5,6 +5,18 @@ import svgwrite
 from datetime import datetime
 from models import Box, ExportBundle
 
+def get_magnets_x(x0, x1, W):
+	if 150 <= W <= 200:
+		xL = x0 + 30
+		xR = x1 - 30
+	elif 200 < W <= 300:
+		xL = x0 + 40
+		xR = x1 - 40
+	else:
+		xL = x0 + 45
+		xR = x1 - 45
+	return xL, xR
+
 def generate_file_name(prefix):
 	timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
 	return f'{prefix}_papelao - tampa ima @{timestamp_str}.svg'
@@ -76,9 +88,6 @@ def export(
 	yF = yE + in_between_spacing
 	yG = yF + H + 10
 
-	xM = x0 + (x1 - x0) / 2
-	yM = yA / 2
-
 	xL = x0 + (x1 - x0) / 4
 	xR = x1 - (x1 - x0) / 4
 
@@ -105,10 +114,17 @@ def export(
 	draw_rectangle(x0, x1, yD, yE, dwg)
 	draw_rectangle(x0, x1, yF, yG, dwg)
 
-	if W + 15 > 100:
-		draw_magnet(xL, yM, magnet_radius, dwg)
-		draw_magnet(xR, yM, magnet_radius, dwg)
+	if D >= 100:
+		yM = y0 + 30
 	else:
+		yM = y0 + (D / 2)
+
+	if W + 15 > 100:
+		xLM, xRM = get_magnets_x(x0, x1, W)
+		draw_magnet(xLM, yM, magnet_radius, dwg)
+		draw_magnet(xRM, yM, magnet_radius, dwg)
+	else:
+		xM = x0 + (x1 - x0) / 2
 		draw_magnet(xM, yM, magnet_radius, dwg)
 
 	if returning:

@@ -20,6 +20,7 @@ from cardboard.base import export as cardboard_base
 from cardboard.top_book import export as cardboard_top_book
 from cardboard.top_lose import export as cardboard_top_lose
 from cardboard.top_magnet import export as cardboard_top_magnet
+from cardboard.base import export_with_magnets as cardboard_base_with_magnets
 
 st.set_page_config(
 	page_title="Touché", 
@@ -89,6 +90,10 @@ with col1:
 		gerar_download(
 			"📦 Base", "Papelão - Base", 
 			cardboard_base
+		)
+		gerar_download(
+			"📦 Base (com imã)", "Papelão - Base com imã", 
+			cardboard_base_with_magnets
 		)
 		gerar_download(
 			"📦 Tampa Solta", "Papelão - Tampa Solta", 

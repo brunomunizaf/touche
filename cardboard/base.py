@@ -5,6 +5,18 @@ import svgwrite
 from datetime import datetime
 from models import Box, ExportBundle
 
+def get_magnets_x(x0, x1, W):
+	if 150 <= W <= 200:
+		xL = x0 + 30
+		xR = x1 - 30
+	elif 200 < W <= 300:
+		xL = x0 + 40
+		xR = x1 - 40
+	else:
+		xL = x0 + 45
+		xR = x1 - 45
+	return xL, xR
+
 def generate_file_name(prefix):
 	timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
 	return f'{prefix}_papelao - base @{timestamp_str}.svg'
@@ -154,6 +166,12 @@ def draw_magnet(
 		stroke_width=0.1
 	))
 
+def export_with_magnets(
+	box: Box, 
+	returning=False
+):
+	return export(box, True, returning)
+
 def export(
 	box: Box, 
 	with_magnets=False,
@@ -207,17 +225,18 @@ def export(
 	draw_left(xL, x0, y0, y1, T, path)
 	draw_right(x1, xR, y0, y1, T, path)
 
-	if with_magnets:
-		xM = x0 + (x1 - x0) / 2
+	if D >= 100:
+		yM = yT - 30
+	else:
 		yM = y1 + (D / 2)
 
-		left_center = x0 + (x1 - x0) / 4
-		right_center = x1 - (x1 - x0) / 4
-
+	if with_magnets:
 		if W + 15 > 100:
-			draw_magnet(left_center, yM, magnet_radius, dwg, 'red')
-			draw_magnet(right_center, yM, magnet_radius, dwg, 'red')
+			xL, xR = get_magnets_x(x0, x1, W)
+			draw_magnet(xL, yM, magnet_radius, dwg, 'red')
+			draw_magnet(xR, yM, magnet_radius, dwg, 'red')
 		else:
+			xM = x0 + (x1 - x0) / 2
 			draw_magnet(xM, yM, magnet_radius, dwg, 'red')
 
 	dwg.add(path)
