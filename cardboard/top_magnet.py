@@ -77,16 +77,18 @@ def export(
 	in_between_spacing = get_in_between_spacing(T)
 	magnet_radius = 7
 
+	clearance = 15
+
 	x0 = 0
 	y0 = 0
-	x1 = x0 + W + 15
+	x1 = x0 + W + clearance
 	yA = y0 + D - 5
 	yB = yA + in_between_spacing
 	yC = yB + H
 	yD = yC + in_between_spacing
 	yE = yD + D
 	yF = yE + in_between_spacing
-	yG = yF + H + 10
+	yG = yF + H + 7
 
 	xL = x0 + (x1 - x0) / 4
 	xR = x1 - (x1 - x0) / 4
@@ -114,13 +116,15 @@ def export(
 	draw_rectangle(x0, x1, yD, yE, dwg)
 	draw_rectangle(x0, x1, yF, yG, dwg)
 
+	correction = 5 # Altura da língua == D - 5
+
 	if D >= 100:
-		yM = y0 + 30
+		yM = y0 + 30 - correction
 	else:
-		yM = y0 + (D / 2)
+		yM = y0 + (D / 2) - correction
 
 	if W + 15 > 100:
-		xLM, xRM = get_magnets_x(x0, x1, W)
+		xLM, xRM = get_magnets_x(x0 + (clearance/2), x1 - (clearance/2), W)
 		draw_magnet(xLM, yM, magnet_radius, dwg)
 		draw_magnet(xRM, yM, magnet_radius, dwg)
 	else:

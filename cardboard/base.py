@@ -226,7 +226,7 @@ def export(
 	draw_right(x1, xR, y0, y1, T, path)
 
 	if D >= 100:
-		yM = yT - 30
+		yM = y1 + 30
 	else:
 		yM = y1 + (D / 2)
 
