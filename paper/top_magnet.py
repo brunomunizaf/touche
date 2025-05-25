@@ -57,7 +57,7 @@ def export(
 		yD = yC + in_between_spacing
 		yE = yD + D
 		yF = yE + in_between_spacing
-		yG = yF + H + 10
+		yG = yF + H + 7
 
 		#Paper
 		x0p = 0
