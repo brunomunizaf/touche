@@ -1,5 +1,6 @@
 import os
 import io
+import math
 import svgwrite
 
 from enums import CoverSide
