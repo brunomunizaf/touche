@@ -34,6 +34,7 @@ def export(
 	H = cm_to_mm(box.height)
 	T = box.thickness
 	
+	clearance = 15
 	offset_shift = 15
 	in_between_spacing = get_in_between_spacing(T)
 
@@ -50,7 +51,7 @@ def export(
 		# Cardboard
 		x0 = 0 + offset_shift
 		y0 = 0 + offset_shift
-		x1 = x0 + W + 15
+		x1 = x0 + W + clearance
 		yA = y0 + D - 5
 		yB = yA + in_between_spacing
 		yC = yB + H
@@ -105,18 +106,18 @@ def export(
 		# Cardboard
 		x0 = 0
 		y0 = 0
-		x1 = x0 + W + 15
+		x1 = x0 + W + clearance
 		yA = y0 + D - 5
 		yB = yA + in_between_spacing
 		yC = yB + H
 		yD = yC + in_between_spacing
 		yE = yD + D
 		yF = yE + in_between_spacing
-		yG = yF + H + 10
+		yG = yF + H + 7
 
 		#Paper
-		x0p = x0 + 15/2
-		x1p = x1 - 15/2
+		x0p = x0 + clearance/2
+		x1p = x1 - clearance/2
 
 		total_width = x1p - x0p
 		total_height = yC + 42

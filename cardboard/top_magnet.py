@@ -123,7 +123,7 @@ def export(
 	else:
 		yM = y0 + (D / 2) - correction
 
-	if W + 15 > 100:
+	if W + clearance > 100:
 		xLM, xRM = get_magnets_x(x0 + (clearance/2), x1 - (clearance/2), W)
 		draw_magnet(xLM, yM, magnet_radius, dwg)
 		draw_magnet(xRM, yM, magnet_radius, dwg)
