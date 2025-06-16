@@ -146,23 +146,176 @@ def export(
   )
 
 	paper_clearance = 15
+	little_square_side = 2
 
 	if side == CoverSide.EXTERNAL:
+		total_width = (2 * (paper_clearance + 0.2 + H + (2.5 * T))) + W
+		total_height = 200
+
+		dwg = svgwrite.Drawing(
+			full_path,
+			size=(f"{total_width}mm", f"{total_height}mm"),
+			viewBox=f"0 0 {total_width + 1} {total_height + 1}"
+		)
+
+		path = dwg.path(
+			stroke="navy",
+			fill="none",
+			stroke_width='0.1'
+		)
+
+
+		# y lateral, de baixo pra cima
+		y_lateral_0 = 0
+		y_lateral_1 = paper_clearance
+		y_lateral_2 = paper_clearance
+		y_lateral_3 = paper_clearance + little_square_side
+		y_lateral_4 = paper_clearance + little_square_side + (2.5 * T)
+		y_lateral_5 = paper_clearance + little_square_side + (2.5 * T) + D
+		y_lateral_6 = paper_clearance + little_square_side + (2.5 * T) + D + (2.5 * T)
+		y_lateral_7 = paper_clearance + little_square_side + (2.5 * T) + D + (2.5 * T) + little_square_side
+		y_lateral_8 = paper_clearance + little_square_side + (2.5 * T) + D + (2.5 * T) + little_square_side
+		y_lateral_9 = paper_clearance + little_square_side + (2.5 * T) + D + (2.5 * T) + little_square_side + paper_clearance
+
+		# --------
+
+		path.push(
+			"M", 
+			paper_clearance + little_square_side, 
+			y_lateral_0
+		)
+
+		path.push(
+			"L", 
+			paper_clearance + little_square_side, 
+			y_lateral_1
+		)
+		path.push(
+			"L", 
+			paper_clearance, 
+			y_lateral_2
+		)
+		path.push(
+			"L", 
+			paper_clearance, 
+			y_lateral_3
+		)
+		path.push(
+			"L", 
+			0, 
+			y_lateral_4
+		)
+		path.push(
+			"L", 
+			0, 
+			y_lateral_5
+		)
+		path.push(
+			"L", 
+			paper_clearance, 
+			y_lateral_6
+		)
+		path.push(
+			"L", 
+			paper_clearance, 
+			y_lateral_7
+		)
+		path.push(
+			"L", 
+			paper_clearance + little_square_side, 
+			y_lateral_8
+		)
+		path.push(
+			"L", 
+			paper_clearance + little_square_side, 
+			y_lateral_9
+		)
+		# path.push(
+		# 	"L", 
+		# 	paper_clearance + little_square_side + H, 
+		# 	D + paper_clearance
+		# )
+		# path.push(
+		# 	"L", 
+		# 	paper_clearance + little_square_side + H + (0.5 * T), 
+		# 	D + (2 * T)
+		# )
+		# path.push(
+		# 	"L", 
+		# 	paper_clearance + little_square_side + H + (1.5 * T), 
+		# 	D
+		# )
+		# path.push(
+		# 	"L", 
+		# 	paper_clearance + little_square_side + H + (2.5 * T), 
+		# 	D + (2 * T)
+		# )
+		# path.push(
+		# 	"L", 
+		# 	paper_clearance + little_square_side + H + (3 * T), 
+		# 	D + paper_clearance
+		# )
+		# path.push(
+		# 	"L", 
+		# 	paper_clearance + little_square_side + H + (3 * T), 
+		# 	D + paper_clearance
+		# )
+		# path.push(
+		# 	"L", 
+		# 	paper_clearance + little_square_side + H + (3 * T) + W - (0.5 * T), 
+		# 	D + paper_clearance
+		# )
+		# path.push( # <------
+		# 	"L", 
+		# 	paper_clearance + little_square_side + H + (3 * T) + W, 
+		# 	D + (2 * T)
+		# )
+		# path.push(
+		# 	"L", 
+		# 	paper_clearance + little_square_side + H + (3 * T) + W + (1.5 * T), 
+		# 	D
+		# )
+		# path.push(
+		# 	"L", 
+		# 	paper_clearance + little_square_side + H + (3 * T) + W + (2.5 * T), 
+		# 	D + (2 * T)
+		# )
+		# path.push(
+		# 	"L", 
+		# 	paper_clearance + little_square_side + H + (3 * T) + W + (3 * T), 
+		# 	D + paper_clearance
+		# )
+
+		#path.push("L", paper_clearance + little_square_side + H - (2.5 * T), D + paper_clearance)
+		#path.push("L", paper_clearance + little_square_side + H - (2 * T), D + (2 * T))
+		#path.push("L", paper_clearance + little_square_side + H - T, D)
+		#path.push("L", paper_clearance + little_square_side + H, D + (2 * T))
+		#path.push("L", paper_clearance + little_square_side + H + 0.5 * T, D + paper_clearance)
+		#path.push("L", paper_clearance + little_square_side + H + W - 0.5 * T, D + paper_clearance)
+		#path.push("L", paper_clearance + little_square_side + H + W, D + (2 * T))
+		#path.push("L", paper_clearance + little_square_side + H + W + T, D)
+		#path.push("L", paper_clearance + little_square_side + H + W + (2 * T), D + (2 * T))
+		#path.push("L", paper_clearance + little_square_side + H + W + (2.5 * T), D + paper_clearance)
+		#path.push("L", paper_clearance + little_square_side + (2 * H) + W + (2.5 * T), D + paper_clearance)
+
+		#path.push("L", )
+
+
   	# Cardboard
-		x0 = D + paper_clearance
-		x1 = x0 + W
-		xL = x0 - D
-		xR = x1 + D
-		xRR = xR + paper_clearance
+		# x0 = D + paper_clearance
+		# x1 = x0 + W
+		# xL = x0 - D
+		# xR = x1 + D
+		# xRR = xR + paper_clearance
 
-		y0 = D + paper_clearance
-		y1 = y0 + H
-		yB = y0 - D
-		yT = y1 + D
-		yTT = yT + paper_clearance
+		# y0 = D + paper_clearance
+		# y1 = y0 + H
+		# yB = y0 - D
+		# yT = y1 + D
+		# yTT = yT + paper_clearance
+	
+		dwg.add(path)
 
-		raise NotImplementedError("Exportação de revestimento externo da base (ima/livro) ainda não foi implementada.")
-		
 	else:
 		x0 = D
 		x1 = x0 + W
