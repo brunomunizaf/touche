@@ -1,26 +1,11 @@
 import io
-import zipfile
 import streamlit as st
 
-from models import Box, ExportBundle
-from enums import TopType, CoverSide
+from models import Box
+from export.layout import BoxLayout
+from export.svg_exporter import SVGExporter
 
-# Paper
-
-from paper.top_book import export as paper_top_book
-from paper.top_lose import export as paper_top_lose
-from paper.top_magnet import export as paper_top_magnet
-
-from paper.base_lose import export as paper_base_lose
-from paper.base_not_lose import export as paper_base_not_lose
-
-# Cardboard
-
-from cardboard.base import export as cardboard_base
-from cardboard.top_book import export as cardboard_top_book
-from cardboard.top_lose import export as cardboard_top_lose
-from cardboard.top_magnet import export as cardboard_top_magnet
-from cardboard.base import export_with_magnets as cardboard_base_with_magnets
+from export.components import CardboardLooseBaseComponent, CardboardLooseTopComponent, CardboardBookTopComponent, InternalLiningBaseComponent, InternalLiningTopComponent, InternalLiningBookTopComponent, CardboardMagnetTopComponent, InternalLiningMagnetTopComponent, ExternalLiningBookTopComponent, ExternalLiningMagnetTopComponent
 
 st.set_page_config(
 	page_title="Touché", 
@@ -37,7 +22,7 @@ step = 1
 if st.session_state['box_type'] is None:
     st.header("1. Qual tipo de caixa você quer construir?")
     box_types = ["Tampa Solta", "Tampa Livro", "Tampa Imã"]
-    images = ["lose_box.png", "book_box.png", "magnet_box.png"]
+    images = ["images/lose_box.png", "images/book_box.png", "images/magnet_box.png"]
     cols = st.columns(3)
     for i, (col, box_type, img) in enumerate(zip(cols, box_types, images)):
         with col:
@@ -87,49 +72,268 @@ if step == 3:
         st.session_state['depth'],
         st.session_state['thickness']
     )
-    def gerar_download(label, file_label, export_func, *args):
-        try:
-            bundle = export_func(box, *args, returning=True)
-            file_name = f"{st.session_state['project_name']} | {file_label}.svg" if st.session_state['project_name'] else "arquivo.svg"
-            st.download_button(
-                label=f"📥 {label}",
-                data=bundle.svg_string,
-                file_name=file_name,
-                mime="image/svg+xml",
-                disabled=not st.session_state['project_name']
-            )
-        except NotImplementedError as e:
-            st.warning(f"⚠️ {label}: {str(e)}")
-        except Exception as e:
-            st.error(f"❌ Erro ao gerar '{label}': {str(e)}")
+    # Export buttons
+    st.subheader("Exportar")
     # Only show relevant options for the selected box type
     if box_type == "Tampa Solta":
         st.subheader("Papelão")
-        gerar_download("📦 Base", "Papelão - Base", cardboard_base)
-        gerar_download("📦 Tampa Solta", "Papelão - Tampa Solta", cardboard_top_lose)
+        def merged_export():
+            thickness = st.session_state['thickness']
+            base = CardboardLooseBaseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], thickness)
+            top = CardboardLooseTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], thickness)
+            layout = BoxLayout([top, base], spacing=20)
+            svg_width = max(top.total_width, base.total_width)
+            svg_height = top.total_height + base.total_height + layout.spacing
+            exporter = SVGExporter(svg_width, svg_height)
+            for comp, x, y in layout.arrange():
+                exporter.add_component(comp, x, y)
+            buffer = io.StringIO()
+            exporter.dwg.write(buffer)
+            return buffer.getvalue()
+        st.download_button(
+            label="📦 Exportar Base + Tampa Solta (Novo)",
+            data=merged_export(),
+            file_name=f"{st.session_state['project_name']} | Papelão - Base + Tampa Solta.svg",
+            mime="image/svg+xml",
+            disabled=not st.session_state['project_name']
+        )
         st.subheader("Revestimento Interno")
-        gerar_download("📩 Base (tampa solta)", "Revestimento Interno - Base (tampa solta)", paper_base_lose, CoverSide.INTERNAL)
-        gerar_download("📩 Tampa Solta", "Revestimento Interno - Tampa Solta", paper_top_lose, CoverSide.INTERNAL)
+        def merged_paper_export():
+            thickness = st.session_state['thickness']
+            paper_base = InternalLiningBaseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], thickness)
+            paper_top = InternalLiningTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], thickness)
+            layout = BoxLayout([paper_top, paper_base], spacing=20)
+            svg_width = max(paper_top.total_width, paper_base.total_width)
+            svg_height = paper_top.total_height + paper_base.total_height + layout.spacing
+            exporter = SVGExporter(svg_width, svg_height)
+            for comp, x, y in layout.arrange():
+                exporter.add_component(comp, x, y)
+            buffer = io.StringIO()
+            exporter.dwg.write(buffer)
+            return buffer.getvalue()
+        st.download_button(
+            label="📩 Exportar Revestimento Interno - Base + Tampa Solta (Novo)",
+            data=merged_paper_export(),
+            file_name=f"{st.session_state['project_name']} | Revestimento Interno - Base + Tampa Solta.svg",
+            mime="image/svg+xml",
+            disabled=not st.session_state['project_name']
+        )
         st.subheader("Revestimento Externo")
-        gerar_download("🎁 Base (tampa solta)", "Revestimento Externo - Base (tampa solta)", paper_base_lose, CoverSide.EXTERNAL)
-        gerar_download("🎁 Tampa Solta", "Revestimento Externo - Tampa Solta", paper_top_lose, CoverSide.EXTERNAL)
+        def merged_magnet_external_lining_export():
+            thickness = st.session_state['thickness']
+            top = ExternalLiningMagnetTopComponent(
+                st.session_state['width'],
+                st.session_state['height'],
+                st.session_state['depth'],
+                thickness
+            )
+            base = InternalLiningBaseComponent(
+                st.session_state['width'],
+                st.session_state['height'],
+                st.session_state['depth'],
+                thickness
+            )
+            layout = BoxLayout([top, base], spacing=20)
+            svg_width = max(top.total_width, base.total_width)
+            svg_height = top.total_height + base.total_height + layout.spacing
+            exporter = SVGExporter(svg_width, svg_height)
+            for comp, x, y in layout.arrange():
+                exporter.add_component(comp, x, y)
+            buffer = io.StringIO()
+            exporter.dwg.write(buffer)
+            return buffer.getvalue()
+        st.download_button(
+            label="🎁 Exportar Revestimento Externo - Base + Tampa Imã (Novo)",
+            data=merged_magnet_external_lining_export(),
+            file_name=f"{st.session_state['project_name']} | Revestimento Externo - Base + Tampa Imã.svg",
+            mime="image/svg+xml",
+            disabled=not st.session_state['project_name']
+        )
     elif box_type == "Tampa Livro":
         st.subheader("Papelão")
-        gerar_download("📦 Base", "Papelão - Base", cardboard_base)
-        gerar_download("📦 Tampa Livro", "Papelão - Tampa Livro", cardboard_top_book)
+        def merged_book_export():
+            thickness = st.session_state['thickness']
+            top = CardboardBookTopComponent(
+                st.session_state['width'],
+                st.session_state['height'],
+                st.session_state['depth'],
+                thickness
+            )
+            base = CardboardLooseBaseComponent(
+                st.session_state['width'],
+                st.session_state['height'],
+                st.session_state['depth'],
+                thickness
+            )
+            layout = BoxLayout([top, base], spacing=20)
+            svg_width = max(top.total_width, base.total_width)
+            svg_height = top.total_height + base.total_height + layout.spacing
+            exporter = SVGExporter(svg_width, svg_height)
+            for comp, x, y in layout.arrange():
+                exporter.add_component(comp, x, y)
+            buffer = io.StringIO()
+            exporter.dwg.write(buffer)
+            return buffer.getvalue()
+        st.download_button(
+            label="📦 Exportar Papelão - Base + Tampa Livro (Novo)",
+            data=merged_book_export(),
+            file_name=f"{st.session_state['project_name']} | Papelão - Base + Tampa Livro.svg",
+            mime="image/svg+xml",
+            disabled=not st.session_state['project_name']
+        )
         st.subheader("Revestimento Interno")
-        gerar_download("📩 Base (exceto tampa solta)", "Revestimento Interno - Base (exceto tampa solta)", paper_base_not_lose, CoverSide.INTERNAL)
-        gerar_download("📩 Tampa Livro", "Revestimento Interno - Tampa Livro", paper_top_book, CoverSide.INTERNAL)
+        def merged_book_internal_lining_export():
+            thickness = st.session_state['thickness']
+            top = InternalLiningBookTopComponent(
+                st.session_state['width'],
+                st.session_state['height'],
+                st.session_state['depth'],
+                thickness
+            )
+            base = InternalLiningBaseComponent(
+                st.session_state['width'],
+                st.session_state['height'],
+                st.session_state['depth'],
+                thickness
+            )
+            layout = BoxLayout([top, base], spacing=20)
+            svg_width = max(top.total_width, base.total_width)
+            svg_height = top.total_height + base.total_height + layout.spacing
+            exporter = SVGExporter(svg_width, svg_height)
+            for comp, x, y in layout.arrange():
+                exporter.add_component(comp, x, y)
+            buffer = io.StringIO()
+            exporter.dwg.write(buffer)
+            return buffer.getvalue()
+        st.download_button(
+            label="📩 Exportar Revestimento Interno - Base + Tampa Livro (Novo)",
+            data=merged_book_internal_lining_export(),
+            file_name=f"{st.session_state['project_name']} | Revestimento Interno - Base + Tampa Livro.svg",
+            mime="image/svg+xml",
+            disabled=not st.session_state['project_name']
+        )
         st.subheader("Revestimento Externo")
-        gerar_download("🎁 Base (exceto tampa solta)", "Revestimento Externo - Base (exceto tampa solta)", paper_base_not_lose, CoverSide.EXTERNAL)
-        gerar_download("🎁 Tampa Livro", "Revestimento Externo - Tampa Livro", paper_top_book, CoverSide.EXTERNAL)
+        def merged_book_external_lining_export():
+            thickness = st.session_state['thickness']
+            top = ExternalLiningBookTopComponent(
+                st.session_state['width'],
+                st.session_state['height'],
+                st.session_state['depth'],
+                thickness
+            )
+            base = InternalLiningBaseComponent(
+                st.session_state['width'],
+                st.session_state['height'],
+                st.session_state['depth'],
+                thickness
+            )
+            layout = BoxLayout([top, base], spacing=20)
+            svg_width = max(top.total_width, base.total_width)
+            svg_height = top.total_height + base.total_height + layout.spacing
+            exporter = SVGExporter(svg_width, svg_height)
+            for comp, x, y in layout.arrange():
+                exporter.add_component(comp, x, y)
+            buffer = io.StringIO()
+            exporter.dwg.write(buffer)
+            return buffer.getvalue()
+        st.download_button(
+            label="🎁 Exportar Revestimento Externo - Base + Tampa Livro (Novo)",
+            data=merged_book_external_lining_export(),
+            file_name=f"{st.session_state['project_name']} | Revestimento Externo - Base + Tampa Livro.svg",
+            mime="image/svg+xml",
+            disabled=not st.session_state['project_name']
+        )
     elif box_type == "Tampa Imã":
         st.subheader("Papelão")
-        gerar_download("📦 Base (com imã)", "Papelão - Base com imã", cardboard_base_with_magnets)
-        gerar_download("📦 Tampa Imã", "Papelão - Tampa Imã", cardboard_top_magnet)
+        def merged_magnet_export():
+            thickness = st.session_state['thickness']
+            top = CardboardMagnetTopComponent(
+                st.session_state['width'],
+                st.session_state['height'],
+                st.session_state['depth'],
+                thickness
+            )
+            base = CardboardLooseBaseComponent(
+                st.session_state['width'],
+                st.session_state['height'],
+                st.session_state['depth'],
+                thickness
+            )
+            layout = BoxLayout([top, base], spacing=20)
+            svg_width = max(top.total_width, base.total_width)
+            svg_height = top.total_height + base.total_height + layout.spacing
+            exporter = SVGExporter(svg_width, svg_height)
+            for comp, x, y in layout.arrange():
+                exporter.add_component(comp, x, y)
+            buffer = io.StringIO()
+            exporter.dwg.write(buffer)
+            return buffer.getvalue()
+        st.download_button(
+            label="📦 Exportar Papelão - Base + Tampa Imã (Novo)",
+            data=merged_magnet_export(),
+            file_name=f"{st.session_state['project_name']} | Papelão - Base + Tampa Imã.svg",
+            mime="image/svg+xml",
+            disabled=not st.session_state['project_name']
+        )
         st.subheader("Revestimento Interno")
-        gerar_download("📩 Base (exceto tampa solta)", "Revestimento Interno - Base (exceto tampa solta)", paper_base_not_lose, CoverSide.INTERNAL)
-        gerar_download("📩 Tampa Imã", "Revestimento Interno - Tampa Imã", paper_top_magnet, CoverSide.INTERNAL)
+        def merged_magnet_internal_lining_export():
+            thickness = st.session_state['thickness']
+            top = InternalLiningMagnetTopComponent(
+                st.session_state['width'],
+                st.session_state['height'],
+                st.session_state['depth'],
+                thickness
+            )
+            base = InternalLiningBaseComponent(
+                st.session_state['width'],
+                st.session_state['height'],
+                st.session_state['depth'],
+                thickness
+            )
+            layout = BoxLayout([top, base], spacing=20)
+            svg_width = max(top.total_width, base.total_width)
+            svg_height = top.total_height + base.total_height + layout.spacing
+            exporter = SVGExporter(svg_width, svg_height)
+            for comp, x, y in layout.arrange():
+                exporter.add_component(comp, x, y)
+            buffer = io.StringIO()
+            exporter.dwg.write(buffer)
+            return buffer.getvalue()
+        st.download_button(
+            label="📩 Exportar Revestimento Interno - Base + Tampa Imã (Novo)",
+            data=merged_magnet_internal_lining_export(),
+            file_name=f"{st.session_state['project_name']} | Revestimento Interno - Base + Tampa Imã.svg",
+            mime="image/svg+xml",
+            disabled=not st.session_state['project_name']
+        )
         st.subheader("Revestimento Externo")
-        gerar_download("🎁 Base (exceto tampa solta)", "Revestimento Externo - Base (exceto tampa solta)", paper_base_not_lose, CoverSide.EXTERNAL)
-        gerar_download("🎁 Tampa Imã", "Revestimento Externo - Tampa Imã", paper_top_magnet, CoverSide.EXTERNAL)
+        def merged_magnet_external_lining_export():
+            thickness = st.session_state['thickness']
+            top = ExternalLiningMagnetTopComponent(
+                st.session_state['width'],
+                st.session_state['height'],
+                st.session_state['depth'],
+                thickness
+            )
+            base = InternalLiningBaseComponent(
+                st.session_state['width'],
+                st.session_state['height'],
+                st.session_state['depth'],
+                thickness
+            )
+            layout = BoxLayout([top, base], spacing=20)
+            svg_width = max(top.total_width, base.total_width)
+            svg_height = top.total_height + base.total_height + layout.spacing
+            exporter = SVGExporter(svg_width, svg_height)
+            for comp, x, y in layout.arrange():
+                exporter.add_component(comp, x, y)
+            buffer = io.StringIO()
+            exporter.dwg.write(buffer)
+            return buffer.getvalue()
+        st.download_button(
+            label="🎁 Exportar Revestimento Externo - Base + Tampa Imã (Novo)",
+            data=merged_magnet_external_lining_export(),
+            file_name=f"{st.session_state['project_name']} | Revestimento Externo - Base + Tampa Imã.svg",
+            mime="image/svg+xml",
+            disabled=not st.session_state['project_name']
+        )
