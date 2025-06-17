@@ -8,4 +8,5 @@ from .internal_lining_book_top import InternalLiningBookTopComponent
 from .internal_lining_magnet_top import InternalLiningMagnetTopComponent
 from .external_lining_book_top import ExternalLiningBookTopComponent
 from .external_lining_magnet_top import ExternalLiningMagnetTopComponent
-from .external_lining_loose_top import ExternalLiningLooseTopComponent 
+from .external_lining_loose_top import ExternalLiningLooseTopComponent
+from .external_lining_base import ExternalLiningBaseComponent

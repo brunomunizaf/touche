@@ -21,6 +21,7 @@ from export.components import InternalLiningMagnetTopComponent
 from export.components import ExternalLiningBookTopComponent
 from export.components import ExternalLiningMagnetTopComponent
 from export.components import ExternalLiningLooseTopComponent
+from export.components import ExternalLiningBaseComponent
 
 # TODO: Add external lining base component
 
@@ -144,7 +145,7 @@ if step == 3:
                 st.session_state['depth'],
                 thickness
             )
-            base = InternalLiningBaseComponent(
+            base = ExternalLiningBaseComponent(
                 st.session_state['width'],
                 st.session_state['height'],
                 st.session_state['depth'],
