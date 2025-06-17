@@ -1,11 +1,14 @@
 import svgwrite
 
-class CardboardLooseBaseComponent:
+class CardboardBaseComponent:
     def __init__(self, width_cm, height_cm, depth_cm, thickness_mm):
+        self.width_cm = width_cm
+        self.height_cm = height_cm
+        self.depth_cm = depth_cm
+        self.thickness_mm = thickness_mm
         self.width = width_cm * 10  # convert to mm
         self.height = height_cm * 10
         self.depth = depth_cm * 10
-        self.thickness = thickness_mm
         self._compute_size()
 
     def _compute_size(self):
@@ -29,7 +32,7 @@ class CardboardLooseBaseComponent:
         flap_right_x = main_right_x + self.depth
         flap_bottom_y = main_bottom_y - self.depth
         flap_top_y = main_top_y + self.depth
-        t = self.thickness
+        t = self.thickness_mm
 
         dwg.add(dwg.polyline([
             (main_left_x, main_bottom_y),
