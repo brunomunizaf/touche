@@ -239,7 +239,7 @@ if step == 3:
                 st.session_state['depth'],
                 thickness
             )
-            base = InternalLiningBaseComponent(
+            base = ExternalLiningBaseComponent(
                 st.session_state['width'],
                 st.session_state['height'],
                 st.session_state['depth'],
@@ -333,7 +333,7 @@ if step == 3:
                 st.session_state['depth'],
                 thickness
             )
-            base = InternalLiningBaseComponent(
+            base = ExternalLiningBaseComponent(
                 st.session_state['width'],
                 st.session_state['height'],
                 st.session_state['depth'],
