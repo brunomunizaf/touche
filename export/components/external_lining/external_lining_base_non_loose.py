@@ -16,12 +16,13 @@ class ExternalLiningBaseNonLooseComponent:
         c = 15 # mm
         
         points = [
-            (0, self.t),
+            (0, 2 * self.t),
             (self.t * 0.5, c),
             (self.w - (self.t * 0.5), c),
-            (self.w, self.t),
-            (self.w + self.t, 2 * self.t),
-            (self.w + 1.5 * self.t, c),
+            (self.w, 2 * self.t),
+            (self.w + self.t, 0),
+            (self.w + 2 * self.t, 2 * self.t),
+            (self.w + 2.5 * self.t, c),
             (self.w + self.h + 2 * self.t, c),
             (self.w + self.h + 2 * self.t, 2 * self.t),
             (self.w + self.h + 3 * self.t, 2 * self.t),
@@ -32,14 +33,16 @@ class ExternalLiningBaseNonLooseComponent:
             (self.w + self.h + 3 * self.t, -self.d - 2 * self.t),
             (self.w + self.h + 2 * self.t, -self.d - 2 * self.t),
             (self.w + self.h + 2 * self.t, -self.d - c),
-            (self.w + self.t, -self.d - c),
-            (self.w + self.t, - self.d - 2 * self.t),
-            (self.w, -self.d - self.t),
+            (self.w + 2 * self.t, -self.d - c),
+            (self.w + 2 * self.t, - self.d - 2 * self.t),
+            (self.w + self.t, -self.d),
+            (self.w, -self.d - 2 * self.t),
             (self.w, -self.d - c),
             (0, -self.d - c),
-            (0, -self.d - self.t),
-            (-self.t, -self.d - 2 * self.t),
-            (-self.t, -self.d - c),
+            (0, -self.d - 2 * self.t),
+            (-self.t, -self.d),
+            (-2 * self.t, -self.d - 2 * self.t),
+            (-2 * self.t, -self.d - c),
             (-self.h - 2 * self.t, -self.d - c),
             (-self.h - 2 * self.t, -self.d - 2 * self.t),
             (-self.h - 3 * self.t, -self.d - 2 * self.t),
@@ -50,9 +53,10 @@ class ExternalLiningBaseNonLooseComponent:
             (-self.h - 3 * self.t, 2 * self.t),
             (-self.h - 2 * self.t, 2 * self.t),
             (-self.h - 2 * self.t, c),
-            (-self.t * 1.5, c),
-            (-self.t, 2 * self.t),
-            (0, self.t)
+            (-2.5 * self.t, c),
+            (-2 * self.t, 2 * self.t),
+            (-self.t, 0),
+            (0, 2 * self.t)
         ]
         path = dwg.path(stroke="navy", fill="none", stroke_width='0.1')
         path.push("M", *points[0])

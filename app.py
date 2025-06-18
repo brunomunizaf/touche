@@ -37,7 +37,7 @@ st.set_page_config(
 if 'box_type' not in st.session_state:
     st.session_state['box_type'] = None
 
-st.title("Touché | Caixas Cartonadas")
+st.title("Touché | Gerador de linhas de corte e vinco")
 
 step = 1
 if st.session_state['box_type'] is None:
