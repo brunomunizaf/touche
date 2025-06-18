@@ -2,10 +2,16 @@ from .cardboard_base import CardboardBaseComponent
 from .cardboard_loose_top import CardboardLooseTopComponent
 from .cardboard_book_top import CardboardBookTopComponent
 from .cardboard_magnet_top import CardboardMagnetTopComponent
+
 from .internal_lining_base import InternalLiningBaseComponent
+from .internal_lining_base_loose_top import InternalLiningBaseForLooseTopComponent
+from .internal_lining_base_book_top import InternalLiningBaseForBookTopComponent
+from .internal_lining_base_magnet_top import InternalLiningBaseForMagnetTopComponent
+
 from .internal_lining_loose_top import InternalLiningLooseTopComponent
 from .internal_lining_book_top import InternalLiningBookTopComponent
 from .internal_lining_magnet_top import InternalLiningMagnetTopComponent
+
 from .external_lining_book_top import ExternalLiningBookTopComponent
 from .external_lining_magnet_top import ExternalLiningMagnetTopComponent
 from .external_lining_loose_top import ExternalLiningLooseTopComponent

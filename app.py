@@ -17,6 +17,11 @@ from export.components import InternalLiningLooseTopComponent
 from export.components import InternalLiningBookTopComponent
 from export.components import InternalLiningMagnetTopComponent
 
+# Internal Lining Base
+from export.components import InternalLiningBaseForLooseTopComponent
+from export.components import InternalLiningBaseForBookTopComponent
+from export.components import InternalLiningBaseForMagnetTopComponent
+
 # External Lining
 from export.components import ExternalLiningBookTopComponent
 from export.components import ExternalLiningMagnetTopComponent
@@ -118,7 +123,7 @@ if step == 3:
         st.subheader("Revestimento Interno")
         def merged_loose_internal_lining_export():
             thickness = st.session_state['thickness']
-            paper_base = InternalLiningBaseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], thickness)
+            paper_base = InternalLiningBaseForLooseTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], thickness)
             paper_top = InternalLiningLooseTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], thickness)
             layout = BoxLayout([paper_top, paper_base], spacing=20)
             svg_width = max(paper_top.total_width, paper_base.total_width)
@@ -208,7 +213,7 @@ if step == 3:
                 st.session_state['depth'],
                 thickness
             )
-            base = InternalLiningBaseComponent(
+            base = InternalLiningBaseForBookTopComponent(
                 st.session_state['width'],
                 st.session_state['height'],
                 st.session_state['depth'],
@@ -302,7 +307,7 @@ if step == 3:
                 st.session_state['depth'],
                 thickness
             )
-            base = InternalLiningBaseComponent(
+            base = InternalLiningBaseForMagnetTopComponent(
                 st.session_state['width'],
                 st.session_state['height'],
                 st.session_state['depth'],
