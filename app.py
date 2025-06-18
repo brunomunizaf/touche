@@ -12,7 +12,6 @@ from export.components import CardboardBookTopComponent
 from export.components import CardboardMagnetTopComponent
 
 # Internal Lining
-from export.components import InternalLiningBaseComponent
 from export.components import InternalLiningLooseTopComponent
 from export.components import InternalLiningBookTopComponent
 from export.components import InternalLiningMagnetTopComponent
@@ -26,9 +25,8 @@ from export.components import InternalLiningBaseForMagnetTopComponent
 from export.components import ExternalLiningBookTopComponent
 from export.components import ExternalLiningMagnetTopComponent
 from export.components import ExternalLiningLooseTopComponent
-from export.components import ExternalLiningBaseComponent
-
-# TODO: Add external lining base component
+from export.components import ExternalLiningBaseLooseComponent
+from export.components import ExternalLiningBaseNonLooseComponent
 
 st.set_page_config(
 	page_title="Touché", 
@@ -150,7 +148,7 @@ if step == 3:
                 st.session_state['depth'],
                 thickness
             )
-            base = ExternalLiningBaseComponent(
+            base = ExternalLiningBaseLooseComponent(
                 st.session_state['width'],
                 st.session_state['height'],
                 st.session_state['depth'],
@@ -244,7 +242,7 @@ if step == 3:
                 st.session_state['depth'],
                 thickness
             )
-            base = ExternalLiningBaseComponent(
+            base = ExternalLiningBaseNonLooseComponent(
                 st.session_state['width'],
                 st.session_state['height'],
                 st.session_state['depth'],
@@ -338,7 +336,7 @@ if step == 3:
                 st.session_state['depth'],
                 thickness
             )
-            base = ExternalLiningBaseComponent(
+            base = ExternalLiningBaseNonLooseComponent(
                 st.session_state['width'],
                 st.session_state['height'],
                 st.session_state['depth'],
