@@ -2,7 +2,7 @@ import io
 import streamlit as st
 
 from models import Box
-from export.layout import BoxLayout
+from export.layout import BoxLayout, MultiInstanceLayout
 from export.svg_exporter import SVGExporter
 
 # Cardboard
@@ -358,3 +358,98 @@ if step == 3:
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
+
+    # New section for multiple instance exports
+    st.header("4. Exportar Múltiplas Instâncias")
+    st.write("Exporte múltiplas instâncias dos elementos com um retângulo representando o papelão completo.")
+    
+    # Create a dictionary to store export functions
+    export_functions = {}
+    
+    if box_type == "Tampa Solta":
+        export_functions = {
+            "Papelão - Base + Tampa Solta": lambda: (
+                CardboardBaseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
+                CardboardLooseTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
+            ),
+            "Revestimento Interno - Base + Tampa Solta": lambda: (
+                InternalLiningBaseForLooseTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
+                InternalLiningLooseTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
+            ),
+            "Revestimento Externo - Base + Tampa Solta": lambda: (
+                ExternalLiningBaseLooseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
+                ExternalLiningLooseTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
+            )
+        }
+    elif box_type == "Tampa Livro":
+        export_functions = {
+            "Papelão - Base + Tampa Livro": lambda: (
+                CardboardBaseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
+                CardboardBookTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
+            ),
+            "Revestimento Interno - Base + Tampa Livro": lambda: (
+                InternalLiningBaseForBookTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
+                InternalLiningBookTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
+            ),
+            "Revestimento Externo - Base + Tampa Livro": lambda: (
+                ExternalLiningBaseNonLooseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
+                ExternalLiningBookTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
+            )
+        }
+    elif box_type == "Tampa Imã":
+        export_functions = {
+            "Papelão - Base + Tampa Imã": lambda: (
+                CardboardBaseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
+                CardboardMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
+            ),
+            "Revestimento Interno - Base + Tampa Imã": lambda: (
+                InternalLiningBaseForMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
+                InternalLiningMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
+            ),
+            "Revestimento Externo - Base + Tampa Imã": lambda: (
+                ExternalLiningBaseNonLooseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
+                ExternalLiningMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
+            )
+        }
+    
+    # Dropdown to select export type
+    selected_export = st.selectbox(
+        "Escolha o tipo de exportação:",
+        list(export_functions.keys()),
+        key="multi_export_type"
+    )
+    
+    # Number input for instances
+    instances = st.number_input(
+        "Número de instâncias:",
+        min_value=1,
+        max_value=20,
+        value=4,
+        key="multi_instances"
+    )
+    
+    # Function to create multi-instance export
+    def create_multi_instance_export():
+        if selected_export in export_functions:
+            components = export_functions[selected_export]()
+            layout = MultiInstanceLayout(list(components), instances, spacing=20, margin=30)
+            
+            exporter = SVGExporter(layout.total_width, layout.total_height)
+            
+            # Add all components
+            for comp, x, y in layout.arrange():
+                exporter.add_component(comp, x, y)
+            
+            buffer = io.StringIO()
+            exporter.dwg.write(buffer)
+            return buffer.getvalue()
+        return ""
+    
+    # Download button for multi-instance export
+    st.download_button(
+        label=f"📦 Exportar {instances} Instâncias - {selected_export}",
+        data=create_multi_instance_export(),
+        file_name=f"{st.session_state['project_name']} | {instances}x {selected_export}.svg",
+        mime="image/svg+xml",
+        disabled=not st.session_state['project_name']
+    )
