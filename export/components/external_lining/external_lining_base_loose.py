@@ -9,53 +9,77 @@ class ExternalLiningBaseLooseComponent:
         self._compute_geometry()
 
     def _compute_geometry(self):
-        self.total_width = self.w + 2.5 * self.t
-        self.total_height = self.h + 2 * self.t
+        paper_clearance = 15
+        self.total_width = self.d + paper_clearance + self.w + self.d + paper_clearance
+        self.total_height = self.d + paper_clearance + self.h + self.d + paper_clearance
 
     def draw(self, dwg, x_offset, y_offset):
-        c = 15 # mm
-        
-        points = [
-            (0, self.t),
-            (self.t * 0.5, c),
-            (self.w - (self.t * 0.5), c),
-            (self.w, self.t),
-            (self.w + self.t, 2 * self.t),
-            (self.w + 1.5 * self.t, c),
-            (self.w + self.h + 2 * self.t, c),
-            (self.w + self.h + 2 * self.t, 2 * self.t),
-            (self.w + self.h + 3 * self.t, 2 * self.t),
-            (self.w + self.h + 3 * self.t, self.t),
-            (self.w + self.h + 3 * self.t + c, 0),
-            (self.w + self.h + 3 * self.t + c, -self.d),
-            (self.w + self.h + 3 * self.t, -self.d - self.t),
-            (self.w + self.h + 3 * self.t, -self.d - 2 * self.t),
-            (self.w + self.h + 2 * self.t, -self.d - 2 * self.t),
-            (self.w + self.h + 2 * self.t, -self.d - c),
-            (self.w + self.t, -self.d - c),
-            (self.w + self.t, - self.d - 2 * self.t),
-            (self.w, -self.d - self.t),
-            (self.w, -self.d - c),
-            (0, -self.d - c),
-            (0, -self.d - self.t),
-            (-self.t, -self.d - 2 * self.t),
-            (-self.t, -self.d - c),
-            (-self.h - 2 * self.t, -self.d - c),
-            (-self.h - 2 * self.t, -self.d - 2 * self.t),
-            (-self.h - 3 * self.t, -self.d - 2 * self.t),
-            (-self.h - 3 * self.t, -self.d - self.t),
-            (-self.h - 3 * self.t - c, -self.d),
-            (-self.h - 3 * self.t - c, 0),
-            (-self.h - 3 * self.t, self.t),
-            (-self.h - 3 * self.t, 2 * self.t),
-            (-self.h - 2 * self.t, 2 * self.t),
-            (-self.h - 2 * self.t, c),
-            (-self.t * 1.5, c),
-            (-self.t, 2 * self.t),
-            (0, self.t)
-        ]
-        path = dwg.path(stroke="navy", fill="none", stroke_width='0.1')
-        path.push("M", *points[0])
-        for pt in points[1:]:
-            path.push("L", *pt)
+        paper_clearance = 15
+
+        W = self.w
+        H = self.h
+        D = self.d
+        T = self.t
+
+        x0 = D + paper_clearance + x_offset
+        x1 = x0 + W
+        xL = x0 - D
+        xR = x1 + D
+        xRR = xR + paper_clearance
+
+        y0 = D + paper_clearance + y_offset
+        y1 = y0 + H
+        yB = y0 - D
+        yT = y1 + D
+        yTT = yT + paper_clearance
+
+        path = dwg.path(
+            stroke="navy",
+            fill="none",
+            stroke_width='0.1'
+        )
+
+        path.push("M", xR + paper_clearance, y1)
+        path.push("L", xR + paper_clearance, y0)
+        path.push("L", xR + 6, y0)
+        path.push("L", xR + 3, y0 - 1.5)
+        path.push("L", x1 + T + 0.5, y0 - 1.5)
+        path.push("L", x1 + T + paper_clearance, y0 - 3.5)
+        path.push("L", x1 + T + paper_clearance, yB - 1.2)
+        path.push("L", x1 + 1.9, yB - 3.1)
+        path.push("L", x1 + 1.9, yB - 5)
+        path.push("L", x1, yB - 5)
+        path.push("L", x1, yB - paper_clearance)
+        path.push("L", x0, yB - paper_clearance)
+        path.push("L", x0, yB - 5)
+        path.push("L", x0 - 1.9, yB - 5)
+        path.push("L", x0 - 1.9, yB - 3.1)
+        path.push("L", x0 - T - paper_clearance, yB - 1.2)
+        path.push("L", x0 - T - paper_clearance, y0 - 3.5)
+        path.push("L", x0 - T - 0.5, y0 - 1.5)
+        path.push("L", xL - 3, y0 - 1.5)
+        path.push("L", xL - 6, y0)
+        path.push("L", xL - paper_clearance, y0)
+        path.push("L", xL - paper_clearance, y1)
+
+        path.push("L", xL - 6, y1)
+        path.push("L", xL - 3, y1 + 1.5)
+        path.push("L", x0 - T - 0.5, y1 + 1.5)
+        path.push("L", x0 - T - paper_clearance, y1 + 3.5)
+        path.push("L", x0 - T - paper_clearance, yT + 1.2)
+        path.push("L", x0 - 1.9, yT + 3.1)
+        path.push("L", x0 - 1.9, yT + 5)
+        path.push("L", x0, yT + 5)
+        path.push("L", x0, yT + paper_clearance)
+        path.push("L", x1, yT + paper_clearance)
+        path.push("L", x1, yT + 5)
+        path.push("L", x1 + 1.9, yT + 5)
+        path.push("L", x1 + 1.9, yT + 3.1)
+        path.push("L", x1 + T + paper_clearance, yT + 1.2)
+        path.push("L", x1 + T + paper_clearance, y1 + 3.5)
+        path.push("L", x1 + T + 0.5, y1 + 1.5)
+        path.push("L", xR + 3, y1 + 1.5)
+        path.push("L", xR + 6, y1)
+        path.push("L", xR + 15, y1)
+
         dwg.add(path)
