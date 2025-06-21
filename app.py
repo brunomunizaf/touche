@@ -278,7 +278,8 @@ if step == 3:
                 st.session_state['width'],
                 st.session_state['height'],
                 st.session_state['depth'],
-                thickness
+                thickness,
+                with_magnets=True
             )
             layout = BoxLayout([top, base], spacing=20)
             svg_width = max(top.total_width, base.total_width)
@@ -399,7 +400,7 @@ if step == 3:
     elif box_type == "Tampa Imã":
         export_functions = {
             "Papelão - Base + Tampa Imã": lambda: (
-                CardboardBaseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
+                CardboardBaseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'], with_magnets=True),
                 CardboardMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
             ),
             "Revestimento Interno - Base + Tampa Imã": lambda: (
