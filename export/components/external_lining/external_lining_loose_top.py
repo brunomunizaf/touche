@@ -1,3 +1,4 @@
+import math
 import svgwrite
 
 class ExternalLiningLooseTopComponent:
