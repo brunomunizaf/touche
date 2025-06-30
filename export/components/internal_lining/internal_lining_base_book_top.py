@@ -26,10 +26,10 @@ class InternalLiningBaseForBookTopComponent:
         main_right_x = main_left_x + self.width
         main_bottom_y = self.depth + y_offset
         main_top_y = main_bottom_y + self.height
-        flap_left_x = main_left_x - self.depth
-        flap_right_x = main_right_x + self.depth
-        flap_bottom_y = main_bottom_y - self.depth
-        flap_top_y = main_top_y + self.depth
+        flap_left_x = (main_left_x - self.depth) + 0.5
+        flap_right_x = (main_right_x + self.depth) - 0.5
+        flap_bottom_y = (main_bottom_y - self.depth) + 0.5
+        flap_top_y = (main_top_y + self.depth) - 0.5
         t = self.thickness
         clearance = 15
 
