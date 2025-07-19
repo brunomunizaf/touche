@@ -33,15 +33,14 @@ from export.components import ExternalLiningBaseLooseComponent
 from export.components import ExternalLiningBaseNonLooseComponent
 
 st.set_page_config(
-	page_title="Touché", 
-	layout="wide"
+	page_title="Touché"
 )
 
 # Step 1: Select box type
 if 'box_type' not in st.session_state:
     st.session_state['box_type'] = None
 
-st.title("Touché | Gerador de linhas de corte e vinco")
+st.title("🗺️ Linhas de corte e vinco | Touché")
 
 step = 1
 if st.session_state['box_type'] is None:
@@ -68,23 +67,91 @@ else:
         st.rerun()
     step = 2
 
-# Step 2: Enter dimensions
+# Step 2: Enter dimensions and configure slots
 if step == 2:
-    st.header("2. Informe as dimensões da caixa")
+    st.header("2. Informe as configurações da caixa")
     with st.form("dimensions_form"):
         project_name = st.text_input(
             "Nome do projeto/cliente",
             placeholder="Ex: Melissa_Casamento",
             key="project_name"
         )
-        width = st.number_input(
-            "Largura (cm)", min_value=1.0, step=0.1, value=20.0, key="width")
-        height = st.number_input(
-            "Altura (cm)", min_value=1.0, step=0.1, value=15.0, key="height")
-        depth = st.number_input(
-            "Profundidade (cm)", min_value=1.0, step=0.1, value=10.0, key="depth")
-        thickness = st.number_input(
-            "Espessura do papelão (mm)", min_value=0.5, step=0.1, value=1.9, key="thickness")
+        # Create 4 columns for the numeric inputs
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            width = st.number_input(
+                "Largura (cm)", min_value=1.0, step=0.1, value=20.0, key="width")
+        
+        with col2:
+            height = st.number_input(
+                "Altura (cm)", min_value=1.0, step=0.1, value=15.0, key="height")
+        
+        with col3:
+            depth = st.number_input(
+                "Profundidade (cm)", min_value=1.0, step=0.1, value=10.0, key="depth")
+        
+        with col4:
+            thickness = st.number_input(
+                "Espessura (mm)", min_value=0.5, step=0.1, value=1.9, key="thickness")
+
+        
+        # Slot configuration options (temporarily disabled)
+        slot_type = st.selectbox(
+            "Tipo de berço",
+            ["Nenhum", "Berço simples", "Berço com divisórias", "Berço personalizado"],
+            key="slot_type",
+            disabled=True
+        )
+        
+        if slot_type != "Nenhum":
+            num_slots = st.number_input(
+                "Número de berços",
+                min_value=1,
+                max_value=20,
+                value=4,
+                key="num_slots",
+                disabled=True
+            )
+            
+            slot_depth = st.number_input(
+                "Profundidade dos berços (cm)",
+                min_value=0.5,
+                max_value=10.0,
+                step=0.1,
+                value=2.0,
+                key="slot_depth",
+                disabled=True
+            )
+            
+            slot_spacing = st.number_input(
+                "Espaçamento entre berços (cm)",
+                min_value=0.1,
+                max_value=5.0,
+                step=0.1,
+                value=0.5,
+                key="slot_spacing",
+                disabled=True
+            )
+            
+            if slot_type == "Berço com divisórias":
+                num_divisions = st.number_input(
+                    "Número de divisórias por berço",
+                    min_value=1,
+                    max_value=10,
+                    value=2,
+                    key="num_divisions",
+                    disabled=True
+                )
+            
+            if slot_type == "Berço personalizado":
+                st.text_area(
+                    "Especificações personalizadas",
+                    placeholder="Descreva as especificações dos berços...",
+                    key="custom_specs",
+                    disabled=True
+                )
+        
         submitted = st.form_submit_button("Próximo")
         if submitted:
             st.session_state['dimensions_done'] = True
@@ -102,11 +169,8 @@ if step == 3:
         st.session_state['depth'],
         st.session_state['thickness']
     )
-    # Export buttons
-    st.subheader("Exportar")
     # Only show relevant options for the selected box type
     if box_type == "Tampa Solta":
-        st.subheader("Papelão")
         def merged_export():
             thickness = st.session_state['thickness']
             base = CardboardBaseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], thickness)
@@ -121,13 +185,12 @@ if step == 3:
             exporter.dwg.write(buffer)
             return buffer.getvalue()
         st.download_button(
-            label="📦 Exportar Base + Tampa Solta (Novo)",
+            label="📦 Papelão (Base + Tampa Solta)",
             data=merged_export(),
             file_name=f"{st.session_state['project_name']} | Papelão - Base + Tampa Solta.svg",
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
-        st.subheader("Revestimento Interno")
         def merged_loose_internal_lining_export():
             thickness = st.session_state['thickness']
             paper_base = InternalLiningBaseForLooseTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], thickness)
@@ -142,13 +205,12 @@ if step == 3:
             exporter.dwg.write(buffer)
             return buffer.getvalue()
         st.download_button(
-            label="📩 Exportar Revestimento Interno - Base + Tampa Solta (Novo)",
+            label="📩 Revestimento Interno (Base + Tampa Solta)",
             data=merged_loose_internal_lining_export(),
             file_name=f"{st.session_state['project_name']} | Revestimento Interno - Base + Tampa Solta.svg",
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
-        st.subheader("Revestimento Externo")
         def merged_loose_external_lining_export():
             thickness = st.session_state['thickness']
             top = ExternalLiningLooseTopComponent(
@@ -173,14 +235,13 @@ if step == 3:
             exporter.dwg.write(buffer)
             return buffer.getvalue()
         st.download_button(
-            label="🎁 Exportar Revestimento Externo - Base + Tampa Solta (Novo)",
+            label="🎁 Revestimento Externo (Base + Tampa Solta)",
             data=merged_loose_external_lining_export(),
             file_name=f"{st.session_state['project_name']} | Revestimento Externo - Base + Tampa Solta.svg",
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
     elif box_type == "Tampa Livro":
-        st.subheader("Papelão")
         def merged_book_export():
             thickness = st.session_state['thickness']
             top = CardboardBookTopComponent(
@@ -205,13 +266,12 @@ if step == 3:
             exporter.dwg.write(buffer)
             return buffer.getvalue()
         st.download_button(
-            label="📦 Exportar Papelão - Base + Tampa Livro (Novo)",
+            label="📦 Papelão (Base + Tampa Livro)",
             data=merged_book_export(),
             file_name=f"{st.session_state['project_name']} | Papelão - Base + Tampa Livro.svg",
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
-        st.subheader("Revestimento Interno")
         def merged_book_internal_lining_export():
             thickness = st.session_state['thickness']
             top = InternalLiningBookTopComponent(
@@ -236,13 +296,12 @@ if step == 3:
             exporter.dwg.write(buffer)
             return buffer.getvalue()
         st.download_button(
-            label="📩 Exportar Revestimento Interno - Base + Tampa Livro (Novo)",
+            label="📩 Revestimento Interno (Base + Tampa Livro)",
             data=merged_book_internal_lining_export(),
             file_name=f"{st.session_state['project_name']} | Revestimento Interno - Base + Tampa Livro.svg",
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
-        st.subheader("Revestimento Externo")
         def merged_book_external_lining_export():
             thickness = st.session_state['thickness']
             top = ExternalLiningBookTopComponent(
@@ -267,14 +326,13 @@ if step == 3:
             exporter.dwg.write(buffer)
             return buffer.getvalue()
         st.download_button(
-            label="🎁 Exportar Revestimento Externo - Base + Tampa Livro (Novo)",
+            label="🎁 Revestimento Externo (Base + Tampa Livro)",
             data=merged_book_external_lining_export(),
             file_name=f"{st.session_state['project_name']} | Revestimento Externo - Base + Tampa Livro.svg",
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
     elif box_type == "Tampa Imã":
-        st.subheader("Papelão")
         def merged_magnet_export():
             thickness = st.session_state['thickness']
             top = CardboardMagnetTopComponent(
@@ -300,13 +358,12 @@ if step == 3:
             exporter.dwg.write(buffer)
             return buffer.getvalue()
         st.download_button(
-            label="📦 Exportar Papelão - Base + Tampa Imã (Novo)",
+            label="📦 Papelão (Base + Tampa Imã)",
             data=merged_magnet_export(),
             file_name=f"{st.session_state['project_name']} | Papelão - Base + Tampa Imã.svg",
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
-        st.subheader("Revestimento Interno")
         def merged_magnet_internal_lining_export():
             thickness = st.session_state['thickness']
             top = InternalLiningMagnetTopComponent(
@@ -331,13 +388,12 @@ if step == 3:
             exporter.dwg.write(buffer)
             return buffer.getvalue()
         st.download_button(
-            label="📩 Exportar Revestimento Interno - Base + Tampa Imã (Novo)",
+            label="📩 Revestimento Interno (Base + Tampa Imã)",
             data=merged_magnet_internal_lining_export(),
             file_name=f"{st.session_state['project_name']} | Revestimento Interno - Base + Tampa Imã.svg",
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
-        st.subheader("Revestimento Externo")
         def merged_magnet_external_lining_export():
             thickness = st.session_state['thickness']
             top = ExternalLiningMagnetTopComponent(
@@ -362,14 +418,13 @@ if step == 3:
             exporter.dwg.write(buffer)
             return buffer.getvalue()
         st.download_button(
-            label="🎁 Exportar Revestimento Externo - Base + Tampa Imã (Novo)",
+            label="🎁 Revestimento Externo (Base + Tampa Imã)",
             data=merged_magnet_external_lining_export(),
             file_name=f"{st.session_state['project_name']} | Revestimento Externo - Base + Tampa Imã.svg",
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
     elif box_type == "Tampa Luva":
-        st.subheader("Papelão")
         def merged_sleeve_export():
             thickness = st.session_state['thickness']
             top = CardboardSleeveTopComponent(
@@ -394,13 +449,12 @@ if step == 3:
             exporter.dwg.write(buffer)
             return buffer.getvalue()
         st.download_button(
-            label="📦 Exportar Papelão - Base + Tampa Luva (Novo)",
+            label="📦 Papelão (Base + Tampa Luva)",
             data=merged_sleeve_export(),
             file_name=f"{st.session_state['project_name']} | Papelão - Base + Tampa Luva.svg",
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
-        st.subheader("Revestimento Interno")
         def merged_sleeve_internal_lining_export():
             thickness = st.session_state['thickness']
             top = InternalLiningSleeveTopComponent(
@@ -425,13 +479,12 @@ if step == 3:
             exporter.dwg.write(buffer)
             return buffer.getvalue()
         st.download_button(
-            label="📩 Exportar Revestimento Interno - Base + Tampa Luva (Novo)",
+            label="📩 Revestimento Interno (Base + Tampa Luva)",
             data=merged_sleeve_internal_lining_export(),
             file_name=f"{st.session_state['project_name']} | Revestimento Interno - Base + Tampa Luva.svg",
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
-        st.subheader("Revestimento Externo")
         def merged_sleeve_external_lining_export():
             thickness = st.session_state['thickness']
             top = ExternalLiningSleeveTopComponent(
@@ -456,16 +509,15 @@ if step == 3:
             exporter.dwg.write(buffer)
             return buffer.getvalue()
         st.download_button(
-            label="🎁 Exportar Revestimento Externo - Base + Tampa Luva (Novo)",
+            label="🎁 Revestimento Externo (Base + Tampa Luva)",
             data=merged_sleeve_external_lining_export(),
             file_name=f"{st.session_state['project_name']} | Revestimento Externo - Base + Tampa Luva.svg",
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
 
-    # New section for multiple instance exports
-    st.header("4. Exportar Múltiplas Instâncias")
-    st.write("Exporte múltiplas instâncias dos elementos com um retângulo representando o papelão completo.")
+    # New section for multiple instance exports (temporarily disabled)
+    st.header("4. Exportar otimização")
     
     # Create a dictionary to store export functions
     export_functions = {}
@@ -535,7 +587,8 @@ if step == 3:
     selected_export = st.selectbox(
         "Escolha o tipo de exportação:",
         list(export_functions.keys()),
-        key="multi_export_type"
+        key="multi_export_type",
+        disabled=True
     )
     
     # Number input for instances
@@ -544,7 +597,8 @@ if step == 3:
         min_value=1,
         max_value=20,
         value=4,
-        key="multi_instances"
+        key="multi_instances",
+        disabled=True
     )
     
     # Function to create multi-instance export
@@ -570,5 +624,5 @@ if step == 3:
         data=create_multi_instance_export(),
         file_name=f"{st.session_state['project_name']} | {instances}x {selected_export}.svg",
         mime="image/svg+xml",
-        disabled=not st.session_state['project_name']
+        disabled=True
     )
