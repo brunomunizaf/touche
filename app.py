@@ -40,23 +40,39 @@ st.set_page_config(
 if 'box_type' not in st.session_state:
     st.session_state['box_type'] = None
 
+if 'slot_type' not in st.session_state:
+    st.session_state['slot_type'] = None
+
 st.title("🗺️ Linhas de corte e vinco | Touché")
 
 step = 1
 if st.session_state['box_type'] is None:
     st.header("1. Qual tipo de caixa você quer construir?")
-    box_types = ["Tampa Solta", "Tampa Livro", "Tampa Imã", "Tampa Luva"]
-    images = ["images/lose_box.png", "images/book_box.png", "images/magnet_box.png", "images/sleeve_box.png"]
-    cols = st.columns(4)
+    box_types = ["Tampa Solta", "Tampa Livro", "Tampa Imã", "Tampa Luva", "Tampa Circular"]
+    images = ["images/lose_box.png", "images/book_box.png", "images/magnet_box.png", "images/sleeve_box.png", "images/circular_box.png"]
+    cols = st.columns(5)
     for i, (col, box_type, img) in enumerate(zip(cols, box_types, images)):
         with col:
-            st.image(img, caption=box_type, use_container_width=True)
-            if box_type == "Tampa Luva":
-                # Desabilitar o botão da Tampa Luva
-                st.button(f"Selecionar: {box_type} (Em breve)", key=f"select_{i}", disabled=True)
-                st.caption("Funcionalidade em desenvolvimento")
+            # Show the image first
+            st.image(img, use_container_width=True)
+            
+            # Create a button below the image
+            if box_type == "Tampa Luva" or box_type == "Tampa Circular":
+                st.button(
+                    f"{box_type}",
+                    key=f"select_{i}",
+                    help=f"Em breve",
+                    use_container_width=True,
+                    disabled=True
+                )
             else:
-                if st.button(f"Selecionar: {box_type}", key=f"select_{i}"):
+                button_clicked = st.button(
+                    f"{box_type}",
+                    key=f"select_{i}",
+                    help=f"Clique para selecionar {box_type}",
+                    use_container_width=True
+                )
+                if button_clicked:
                     st.session_state['box_type'] = box_type
                     st.rerun()
 else:
@@ -64,12 +80,59 @@ else:
     st.success(f"Tipo de caixa selecionado: {box_type}")
     if st.button("Trocar tipo de caixa", key="change_type"):
         st.session_state['box_type'] = None
+        st.session_state['slot_type'] = None
         st.rerun()
     step = 2
 
-# Step 2: Enter dimensions and configure slots
-if step == 2:
-    st.header("2. Informe as configurações da caixa")
+# Step 2: Choose slot type
+if step == 2 and st.session_state['slot_type'] is None:
+    st.header("2. Qual tipo de berço você quer adicionar?")
+    slot_types = ["Nenhum", "Berço Quadrado", "Berço Circular", "Berço Cilíndrico"]
+    
+    # Create 4 columns for the slot types
+    cols = st.columns(4)
+    for i, (col, slot_type) in enumerate(zip(cols, slot_types)):
+        with col:
+            # Show the appropriate image first
+            if slot_type == "Nenhum":
+                st.image("images/none.png", use_container_width=True)
+            elif slot_type == "Berço Quadrado":
+                st.image("images/rectangular_slot.png", use_container_width=True)
+            elif slot_type == "Berço Circular":
+                st.image("images/circular_slot.png", use_container_width=True)
+            elif slot_type == "Berço Cilíndrico":
+                st.image("images/cilindric_slot.png", use_container_width=True)
+            
+            # Create a button below the image
+            if slot_type == "Nenhum":
+                button_clicked = st.button(
+                    f"{slot_type.replace('Berço ', '')}",
+                    key=f"select_slot_{i}",
+                    help=f"Clique para selecionar {slot_type}",
+                    use_container_width=True
+                )
+                if button_clicked:
+                    st.session_state['slot_type'] = slot_type
+                    st.rerun()
+            else:
+                st.button(
+                    f"{slot_type.replace('Berço ', '')}",
+                    key=f"select_slot_{i}",
+                    help=f"Em breve",
+                    use_container_width=True,
+                    disabled=True
+                )
+elif step == 2 and st.session_state['slot_type'] is not None:
+    slot_type = st.session_state['slot_type']
+    st.success(f"Tipo de berço selecionado: {slot_type}")
+    if st.button("Trocar tipo de berço", key="change_slot_type"):
+        st.session_state['slot_type'] = None
+        st.rerun()
+    step = 3
+
+# Step 3: Enter dimensions and configure slots
+if step == 3:
+    st.header("3. Informe as configurações da caixa")
     with st.form("dimensions_form"):
         project_name = st.text_input(
             "Nome do projeto/cliente",
@@ -96,61 +159,22 @@ if step == 2:
                 "Espessura (mm)", min_value=0.5, step=0.1, value=1.9, key="thickness")
 
         
-        # Slot configuration options (temporarily disabled)
-        slot_type = st.selectbox(
-            "Tipo de berço",
-            ["Nenhum", "Berço simples", "Berço com divisórias", "Berço personalizado"],
-            key="slot_type",
-            disabled=True
-        )
+        # Slot configuration options
+        selected_slot_type = st.session_state.get('slot_type', 'Nenhum')
         
-        if slot_type != "Nenhum":
-            num_slots = st.number_input(
-                "Número de berços",
-                min_value=1,
-                max_value=20,
-                value=4,
-                key="num_slots",
-                disabled=True
-            )
-            
+        if selected_slot_type != "Nenhum":
             slot_depth = st.number_input(
-                "Profundidade dos berços (cm)",
+                "Profundidade do berço (cm)",
                 min_value=0.5,
                 max_value=10.0,
                 step=0.1,
                 value=2.0,
-                key="slot_depth",
-                disabled=True
+                key="slot_depth"
             )
             
-            slot_spacing = st.number_input(
-                "Espaçamento entre berços (cm)",
-                min_value=0.1,
-                max_value=5.0,
-                step=0.1,
-                value=0.5,
-                key="slot_spacing",
-                disabled=True
-            )
+            # Apenas profundidade é necessária - altura e largura são inferidas das dimensões da caixa
             
-            if slot_type == "Berço com divisórias":
-                num_divisions = st.number_input(
-                    "Número de divisórias por berço",
-                    min_value=1,
-                    max_value=10,
-                    value=2,
-                    key="num_divisions",
-                    disabled=True
-                )
-            
-            if slot_type == "Berço personalizado":
-                st.text_area(
-                    "Especificações personalizadas",
-                    placeholder="Descreva as especificações dos berços...",
-                    key="custom_specs",
-                    disabled=True
-                )
+
         
         submitted = st.form_submit_button("Próximo")
         if submitted:
@@ -159,9 +183,9 @@ if step == 2:
     if st.session_state.get('dimensions_done'):
         step = 3
 
-# Step 3: Show relevant export options
+# Step 4: Show relevant export options
 if step == 3:
-    st.header("3. Exportar linhas de corte")
+    st.header("4. Exportar linhas de corte")
     box = Box(
         st.session_state['project_name'],
         st.session_state['width'],
@@ -517,7 +541,7 @@ if step == 3:
         )
 
     # New section for multiple instance exports (temporarily disabled)
-    st.header("4. Exportar otimização")
+    st.header("5. Exportar otimização")
     
     # Create a dictionary to store export functions
     export_functions = {}
