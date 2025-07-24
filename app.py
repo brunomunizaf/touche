@@ -11,18 +11,21 @@ from export.components import CardboardLooseTopComponent
 from export.components import CardboardBookTopComponent
 from export.components import CardboardMagnetTopComponent
 from export.components import CardboardSleeveTopComponent
+from export.components import CardboardHalfSpineTopComponent
 
 # Internal Lining
 from export.components import InternalLiningLooseTopComponent
 from export.components import InternalLiningBookTopComponent
 from export.components import InternalLiningMagnetTopComponent
 from export.components import InternalLiningSleeveTopComponent
+from export.components import InternalLiningHalfSpineTopComponent
 
 # Internal Lining Base
 from export.components import InternalLiningBaseForLooseTopComponent
 from export.components import InternalLiningBaseForBookTopComponent
 from export.components import InternalLiningBaseForMagnetTopComponent
 from export.components import InternalLiningBaseForSleeveTopComponent
+from export.components import InternalLiningBaseForHalfSpineTopComponent
 
 # External Lining
 from export.components import ExternalLiningBookTopComponent
@@ -31,6 +34,7 @@ from export.components import ExternalLiningLooseTopComponent
 from export.components import ExternalLiningSleeveTopComponent
 from export.components import ExternalLiningBaseLooseComponent
 from export.components import ExternalLiningBaseNonLooseComponent
+from export.components import ExternalLiningHalfSpineTopComponent
 
 st.set_page_config(
 	page_title="Touché"
@@ -48,15 +52,12 @@ st.title("🗺️ Linhas de corte e vinco | Touché")
 step = 1
 if st.session_state['box_type'] is None:
     st.header("1. Qual tipo de caixa você quer construir?")
-    box_types = ["Tampa Solta", "Tampa Livro", "Tampa Imã", "Tampa Luva", "Tampa Circular"]
-    images = ["images/lose_box.png", "images/book_box.png", "images/magnet_box.png", "images/sleeve_box.png", "images/circular_box.png"]
-    cols = st.columns(5)
+    box_types = ["Tampa Solta", "Tampa Livro", "Tampa Imã", "Tampa Luva", "Meia Lombada", "Tampa Circular"]
+    images = ["images/lose_box.png", "images/book_box.png", "images/magnet_box.png", "images/sleeve_box.png", "images/half_spine_box.png", "images/circular_box.png"]
+    cols = st.columns(6)
     for i, (col, box_type, img) in enumerate(zip(cols, box_types, images)):
         with col:
-            # Show the image first
             st.image(img, use_container_width=True)
-            
-            # Create a button below the image
             if box_type == "Tampa Luva" or box_type == "Tampa Circular":
                 st.button(
                     f"{box_type}",
@@ -65,6 +66,16 @@ if st.session_state['box_type'] is None:
                     use_container_width=True,
                     disabled=True
                 )
+            elif box_type == "Meia Lombada":
+                button_clicked = st.button(
+                    f"{box_type}",
+                    key=f"select_{i}",
+                    help=f"Clique para selecionar {box_type}",
+                    use_container_width=True
+                )
+                if button_clicked:
+                    st.session_state['box_type'] = box_type
+                    st.rerun()
             else:
                 button_clicked = st.button(
                     f"{box_type}",
@@ -539,6 +550,97 @@ if step == 3:
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
+    elif box_type == "Meia Lombada":
+        def merged_half_spine_export():
+            thickness = st.session_state['thickness']
+            top = CardboardHalfSpineTopComponent(
+                st.session_state['width'],
+                st.session_state['height'],
+                st.session_state['depth'],
+                thickness
+            )
+            base = CardboardBaseComponent(
+                st.session_state['width'],
+                st.session_state['height'],
+                st.session_state['depth'],
+                thickness
+            )
+            layout = BoxLayout([top, base], spacing=20)
+            svg_width = max(top.total_width, base.total_width)
+            svg_height = top.total_height + base.total_height + layout.spacing
+            exporter = SVGExporter(svg_width, svg_height)
+            for comp, x, y in layout.arrange():
+                exporter.add_component(comp, x, y)
+            buffer = io.StringIO()
+            exporter.dwg.write(buffer)
+            return buffer.getvalue()
+        st.download_button(
+            label="📦 Papelão (Base + Meia Lombada)",
+            data=merged_half_spine_export(),
+            file_name=f"{st.session_state['project_name']} | Papelão - Base + Meia Lombada.svg",
+            mime="image/svg+xml",
+            disabled=not st.session_state['project_name']
+        )
+        def merged_half_spine_internal_lining_export():
+            thickness = st.session_state['thickness']
+            top = InternalLiningHalfSpineTopComponent(
+                st.session_state['width'],
+                st.session_state['height'],
+                st.session_state['depth'],
+                thickness
+            )
+            base = InternalLiningBaseForHalfSpineTopComponent(
+                st.session_state['width'],
+                st.session_state['height'],
+                st.session_state['depth'],
+                thickness
+            )
+            layout = BoxLayout([top, base], spacing=20)
+            svg_width = max(top.total_width, base.total_width)
+            svg_height = top.total_height + base.total_height + layout.spacing
+            exporter = SVGExporter(svg_width, svg_height)
+            for comp, x, y in layout.arrange():
+                exporter.add_component(comp, x, y)
+            buffer = io.StringIO()
+            exporter.dwg.write(buffer)
+            return buffer.getvalue()
+        st.download_button(
+            label="📩 Revestimento Interno (Base + Meia Lombada)",
+            data=merged_half_spine_internal_lining_export(),
+            file_name=f"{st.session_state['project_name']} | Revestimento Interno - Base + Meia Lombada.svg",
+            mime="image/svg+xml",
+            disabled=not st.session_state['project_name']
+        )
+        def merged_half_spine_external_lining_export():
+            thickness = st.session_state['thickness']
+            top = ExternalLiningHalfSpineTopComponent(
+                st.session_state['width'],
+                st.session_state['height'],
+                st.session_state['depth'],
+                thickness
+            )
+            base = ExternalLiningBaseNonLooseComponent(
+                st.session_state['width'],
+                st.session_state['height'],
+                st.session_state['depth'],
+                thickness
+            )
+            layout = BoxLayout([top, base], spacing=20)
+            svg_width = max(top.total_width, base.total_width)
+            svg_height = top.total_height + base.total_height + layout.spacing
+            exporter = SVGExporter(svg_width, svg_height)
+            for comp, x, y in layout.arrange():
+                exporter.add_component(comp, x, y)
+            buffer = io.StringIO()
+            exporter.dwg.write(buffer)
+            return buffer.getvalue()
+        st.download_button(
+            label="🎁 Revestimento Externo (Base + Meia Lombada)",
+            data=merged_half_spine_external_lining_export(),
+            file_name=f"{st.session_state['project_name']} | Revestimento Externo - Base + Meia Lombada.svg",
+            mime="image/svg+xml",
+            disabled=not st.session_state['project_name']
+        )
 
     # New section for multiple instance exports (temporarily disabled)
     st.header("5. Exportar otimização")
@@ -604,6 +706,21 @@ if step == 3:
             "Revestimento Externo - Base + Tampa Luva": lambda: (
                 ExternalLiningBaseNonLooseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
                 ExternalLiningSleeveTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
+            )
+        }
+    elif box_type == "Meia Lombada":
+        export_functions = {
+            "Papelão - Base + Meia Lombada": lambda: (
+                CardboardBaseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
+                CardboardHalfSpineTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
+            ),
+            "Revestimento Interno - Base + Meia Lombada": lambda: (
+                InternalLiningBaseForHalfSpineTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
+                InternalLiningHalfSpineTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
+            ),
+            "Revestimento Externo - Base + Meia Lombada": lambda: (
+                ExternalLiningBaseNonLooseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
+                ExternalLiningHalfSpineTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
             )
         }
     
