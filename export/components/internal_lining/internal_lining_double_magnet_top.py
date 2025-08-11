@@ -1,4 +1,4 @@
-class InternalLiningMagnetTopComponent:
+class InternalLiningDoubleMagnetTopComponent:
     def __init__(self, width_cm, height_cm, depth_cm, thickness_mm):
         self.largura = width_cm * 10
         self.altura = height_cm * 10

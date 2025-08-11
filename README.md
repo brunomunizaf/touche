@@ -4,7 +4,7 @@ A Streamlit application for generating cutting and folding lines for various box
 
 ## Features
 
-- **Box Types**: Loose Top, Book Top, Magnet Top, Sleeve Top, Half Spine, Circular
+- **Box Types**: Loose Top, Book Top, Double Magnet Top, Sleeve Top, Single Magnet Top, Circular
 - **Slot Types**: None, Square, Circular, Cylindrical
 - **Materials**: Cardboard, Internal Lining, External Lining
 - **Export**: SVG format for cutting and folding lines

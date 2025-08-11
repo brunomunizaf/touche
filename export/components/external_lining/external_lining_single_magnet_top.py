@@ -38,13 +38,13 @@ class ExternalLiningSingleMagnetTopComponent:
         coordenada_superior = coordenada_extrema_superior - self.espaco_sacado
 
         dwg.add(dwg.polyline([
-            (abcissa_extrema_esquerda, coordenada_superior),
+            (abcissa_extrema_esquerda, coordenada_superior - self.espaco_sacado),
             (abcissa_esquerda, coordenada_extrema_superior),
             (abcissa_direita, coordenada_extrema_superior),
-            (abcissa_extrema_direita, coordenada_superior),
-            (abcissa_extrema_direita, coordenada_inferior),
+            (abcissa_extrema_direita, coordenada_superior - self.espaco_sacado),
+            (abcissa_extrema_direita, coordenada_inferior + self.espaco_sacado),
             (abcissa_direita, coordenada_extrema_inferior),
             (abcissa_esquerda, coordenada_extrema_inferior),
-            (abcissa_extrema_esquerda, coordenada_inferior),
-            (abcissa_extrema_esquerda, coordenada_superior),
+            (abcissa_extrema_esquerda, coordenada_inferior + self.espaco_sacado),
+            (abcissa_extrema_esquerda, coordenada_superior - self.espaco_sacado),
         ], stroke="navy", fill="none", stroke_width='0.1'))

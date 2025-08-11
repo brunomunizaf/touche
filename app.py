@@ -9,27 +9,27 @@ from export.svg_exporter import SVGExporter
 from export.components import CardboardBaseComponent
 from export.components import CardboardLooseTopComponent
 from export.components import CardboardBookTopComponent
-from export.components import CardboardMagnetTopComponent
+from export.components import CardboardDoubleMagnetTopComponent
 from export.components import CardboardSleeveTopComponent
-from export.components import CardboardHalfSpineTopComponent
+from export.components import CardboardSingleMagnetTopComponent
 from export.components import CardboardCircularTopComponent
 from export.components import CardboardCircularBaseComponent
 
 # Internal Lining
 from export.components import InternalLiningLooseTopComponent
 from export.components import InternalLiningBookTopComponent
-from export.components import InternalLiningMagnetTopComponent
+from export.components import InternalLiningDoubleMagnetTopComponent
 from export.components import InternalLiningSleeveTopComponent
-from export.components import InternalLiningHalfSpineTopComponent
+from export.components import InternalLiningSingleMagnetTopComponent
 from export.components import InternalLiningCircularTopComponent
 from export.components import InternalLiningCircularBaseComponent
 
 # Internal Lining Base
 from export.components import InternalLiningBaseForLooseTopComponent
 from export.components import InternalLiningBaseForBookTopComponent
-from export.components import InternalLiningBaseForMagnetTopComponent
+from export.components import InternalLiningBaseForDoubleMagnetTopComponent
 from export.components import InternalLiningBaseForSleeveTopComponent
-from export.components import InternalLiningBaseForHalfSpineTopComponent
+from export.components import InternalLiningBaseForSingleMagnetTopComponent
 
 # External Lining
 from export.components import ExternalLiningBookTopComponent
@@ -59,7 +59,7 @@ step = 1
 if st.session_state['box_type'] is None:
     st.header("1. Qual tipo de caixa você quer construir?")
     box_types = ["Tampa Solta", "Tampa Livro", "Tampa Imã Dupla", "Tampa Luva", "Tampa Imã Simples", "Tampa Circular"]
-    images = ["images/lose_box.png", "images/book_box.png", "images/magnet_box.png", "images/sleeve_box.png", "images/half_spine_box.png", "images/circular_box.png"]
+    images = ["images/lose_box.png", "images/book_box.png", "images/double_magnet_box.png", "images/sleeve_box.png", "images/single_magnet_box.png", "images/circular_box.png"]
     cols = st.columns(6)
     for i, (col, box_type, img) in enumerate(zip(cols, box_types, images)):
         with col:
@@ -391,7 +391,7 @@ if step == 3:
     elif box_type == "Tampa Imã Dupla":
         def merged_magnet_export():
             thickness = st.session_state['thickness']
-            top = CardboardMagnetTopComponent(
+            top = CardboardDoubleMagnetTopComponent(
                 st.session_state['width'],
                 st.session_state['height'],
                 st.session_state['depth'],
@@ -422,13 +422,13 @@ if step == 3:
         )
         def merged_magnet_internal_lining_export():
             thickness = st.session_state['thickness']
-            top = InternalLiningMagnetTopComponent(
+            top = InternalLiningDoubleMagnetTopComponent(
                 st.session_state['width'],
                 st.session_state['height'],
                 st.session_state['depth'],
                 thickness
             )
-            base = InternalLiningBaseForMagnetTopComponent(
+            base = InternalLiningBaseForDoubleMagnetTopComponent(
                 st.session_state['width'],
                 st.session_state['height'],
                 st.session_state['depth'],
@@ -574,7 +574,7 @@ if step == 3:
     elif box_type == "Tampa Imã Simples":
         def merged_half_spine_export():
             thickness = st.session_state['thickness']
-            top = CardboardHalfSpineTopComponent(
+            top = CardboardSingleMagnetTopComponent(
                 st.session_state['width'],
                 st.session_state['height'],
                 st.session_state['depth'],
@@ -604,13 +604,13 @@ if step == 3:
         )
         def merged_half_spine_internal_lining_export():
             thickness = st.session_state['thickness']
-            top = InternalLiningHalfSpineTopComponent(
+            top = InternalLiningSingleMagnetTopComponent(
                 st.session_state['width'],
                 st.session_state['height'],
                 st.session_state['depth'],
                 thickness
             )
-            base = InternalLiningBaseForHalfSpineTopComponent(
+            base = InternalLiningBaseForSingleMagnetTopComponent(
                 st.session_state['width'],
                 st.session_state['height'],
                 st.session_state['depth'],
@@ -776,11 +776,11 @@ if step == 3:
         export_functions = {
             "Papelão - Base + Tampa Imã Dupla": lambda: (
                 CardboardBaseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'], with_magnets=True),
-                CardboardMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
+                CardboardDoubleMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
             ),
             "Revestimento Interno - Base + Tampa Imã Dupla": lambda: (
-                InternalLiningBaseForMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
-                InternalLiningMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
+                InternalLiningBaseForDoubleMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
+                InternalLiningDoubleMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
             ),
             "Revestimento Externo - Base + Tampa Imã Dupla": lambda: (
                 ExternalLiningBaseNonLooseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
@@ -806,11 +806,11 @@ if step == 3:
         export_functions = {
             "Papelão - Base + Tampa Imã Simples": lambda: (
                 CardboardBaseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
-                CardboardHalfSpineTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
+                CardboardSingleMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
             ),
             "Revestimento Interno - Base + Tampa Imã Simples": lambda: (
-                InternalLiningBaseForHalfSpineTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
-                InternalLiningHalfSpineTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
+                InternalLiningBaseForSingleMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
+                InternalLiningSingleMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
             ),
             "Revestimento Externo - Base + Tampa Imã Simples": lambda: (
                 ExternalLiningBaseNonLooseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
