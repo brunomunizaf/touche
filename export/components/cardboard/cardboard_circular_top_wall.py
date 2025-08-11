@@ -1,0 +1,26 @@
+import math
+
+class CardboardCircularTopWallComponent:
+    def __init__(self, box_diameter_cm):
+        self.diametro = (box_diameter_cm * 10) + 5
+        self._compute_size()
+
+    def _compute_size(self):
+        self.sobra = 2
+        self.raio = self.diametro / 2
+        self.altura = 20
+        self.largura = 2 * math.pi * self.raio + self.sobra
+
+        self.total_width = self.largura
+        self.total_height = self.altura
+
+    def draw(self, dwg, x_offset, y_offset):
+        dwg.add(
+            dwg.rect(
+                insert=(x_offset, y_offset), 
+                size=(self.largura, self.altura), 
+                stroke="black", 
+                fill="none", 
+                stroke_width=0.1
+            )
+        )

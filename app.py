@@ -12,8 +12,8 @@ from export.components import CardboardBookTopComponent
 from export.components import CardboardDoubleMagnetTopComponent
 from export.components import CardboardSleeveTopComponent
 from export.components import CardboardSingleMagnetTopComponent
-from export.components import CardboardCircularTopComponent
-from export.components import CardboardCircularBaseComponent
+from export.components import CardboardCircularTopLidComponent, CardboardCircularTopWallComponent
+from export.components import CardboardCircularBaseLidComponent, CardboardCircularBaseWallComponent
 
 # Internal Lining
 from export.components import InternalLiningLooseTopComponent
@@ -664,16 +664,27 @@ if step == 3:
         )
     elif box_type == "Tampa Circular":
         def circular_export():
-            top = CardboardCircularTopComponent(
+            # Tampa superior - lid e wall
+            top_lid = CardboardCircularTopLidComponent(
                 st.session_state['circular_box_diameter']
             )
-            base = CardboardCircularBaseComponent(
+            top_wall = CardboardCircularTopWallComponent(
+                st.session_state['circular_box_diameter']
+            )
+            
+            # Base inferior - lid e wall
+            base_lid = CardboardCircularBaseLidComponent(
+                st.session_state['circular_box_diameter']
+            )
+            base_wall = CardboardCircularBaseWallComponent(
                 st.session_state['circular_box_diameter'],
                 st.session_state['circular_box_depth']
             )
-            layout = BoxLayout([top, base], spacing=20)
-            svg_width = max(top.total_width, base.total_width)
-            svg_height = top.total_height + base.total_height + layout.spacing
+            
+            # Layout com os 4 componentes
+            layout = BoxLayout([top_lid, top_wall, base_lid, base_wall], spacing=20)
+            svg_width = max(top_lid.total_width, top_wall.total_width, base_lid.total_width, base_wall.total_width)
+            svg_height = top_lid.total_height + top_wall.total_height + base_lid.total_height + base_wall.total_height + layout.spacing * 3
             exporter = SVGExporter(svg_width, svg_height)
             for comp, x, y in layout.arrange():
                 exporter.add_component(comp, x, y)
@@ -820,8 +831,10 @@ if step == 3:
     elif box_type == "Tampa Circular":
         export_functions = {
             "Papelão - Base + Tampa Circular": lambda: [
-                CardboardCircularTopComponent(st.session_state['circular_box_diameter']),
-                CardboardCircularBaseComponent(st.session_state['circular_box_diameter'], st.session_state['circular_box_depth'])
+                CardboardCircularTopLidComponent(st.session_state['circular_box_diameter']),
+                CardboardCircularTopWallComponent(st.session_state['circular_box_diameter']),
+                CardboardCircularBaseLidComponent(st.session_state['circular_box_diameter']),
+                CardboardCircularBaseWallComponent(st.session_state['circular_box_diameter'], st.session_state['circular_box_depth'])
             ],
             "Revestimento Interno - Base + Tampa Circular": lambda: [
                 InternalLiningCircularTopComponent(st.session_state['circular_box_diameter']),
