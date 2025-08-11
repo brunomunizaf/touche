@@ -1,58 +1,50 @@
-import svgwrite
-import math
-
 class ExternalLiningHalfSpineTopComponent:
     def __init__(self, width_cm, height_cm, depth_cm, thickness_mm):
-        self.box_width_mm = width_cm * 10  # convert to mm
-        self.box_height_mm = height_cm * 10
-        self.box_depth_mm = depth_cm * 10
-        self.cardboard_thickness_mm = thickness_mm
-        self._compute_geometry()
+        self.largura = width_cm * 10
+        self.altura = height_cm * 10
+        self.profundidade = depth_cm * 10
+        self.espessura = thickness_mm
+        self._compute_size()
 
-    def _compute_geometry(self):
-        self.outer_offset_mm = 15
-        self.spacing_between_panels_mm = self._get_spacing_between_panels(self.cardboard_thickness_mm)
-        self.panel_height_mm = self.box_height_mm
-        self.panel_width_mm = self.box_width_mm + self.outer_offset_mm
-        self.flap_height_mm = (self.box_depth_mm / 2) - 5
-        self.spine_panel_height_mm = self.box_depth_mm / 2
-        self.total_width = self.panel_width_mm
-        self.total_height = (
-            self.flap_height_mm + self.spacing_between_panels_mm + self.panel_height_mm + self.spacing_between_panels_mm + self.spine_panel_height_mm
+    def _compute_size(self):
+        self.folga = 10
+        self.espaco_sacado = 15
+        self.largura_do_papelao = self.largura + self.folga
+        self.espacamento = self._calcular_espacamento(self.espessura)
+        self.altura_do_papelao_com_espacamentos = (
+            self.profundidade + self.espacamento + self.altura + self.espacamento + self.profundidade
         )
+        self.largura_total = self.largura_do_papelao + self.espaco_sacado * 2
+        self.altura_total = self.altura_do_papelao_com_espacamentos + self.espaco_sacado * 2
 
-    def _get_spacing_between_panels(self, thickness):
-        if 1.5 <= thickness <= 2:
+        self.total_width = self.largura_total
+        self.total_height = self.altura_total
+
+    def _calcular_espacamento(self, espessura):
+        if 1.5 <= espessura <= 2:
             return 6
         else:
             return 8
 
     def draw(self, dwg, x_offset, y_offset):
-        left_x = x_offset
-        right_x = left_x + self.total_width
+        abcissa_extrema_esquerda = x_offset
+        abcissa_esquerda = abcissa_extrema_esquerda + 2 * self.espaco_sacado
+        abcissa_extrema_direita = abcissa_extrema_esquerda + self.espaco_sacado + self.largura_do_papelao + self.espaco_sacado
+        abcissa_direita = abcissa_extrema_direita - 2 * self.espaco_sacado
 
-        # Flap (meia profundidade - 5)
-        flap_top_y = y_offset
-        flap_bottom_y = flap_top_y + self.flap_height_mm
+        coordenada_extrema_inferior = y_offset
+        coordenada_inferior = coordenada_extrema_inferior + 2 * self.espaco_sacado
+        coordenada_extrema_superior = coordenada_inferior + self.altura_do_papelao_com_espacamentos + self.espaco_sacado
+        coordenada_superior = coordenada_extrema_superior - 2 * self.espaco_sacado
 
-        # Painel (altura)
-        panel_top_y = flap_bottom_y + self.spacing_between_panels_mm
-        panel_bottom_y = panel_top_y + self.panel_height_mm
-
-        # Spine (meia profundidade)
-        spine_top_y = panel_bottom_y + self.spacing_between_panels_mm
-        spine_bottom_y = spine_top_y + self.spine_panel_height_mm
-
-        # Desenhar as três partes
-        for top_y, bottom_y in [
-            (flap_top_y, flap_bottom_y),
-            (panel_top_y, panel_bottom_y),
-            (spine_top_y, spine_bottom_y)
-        ]:
-            dwg.add(dwg.polyline([
-                (left_x, top_y),
-                (right_x, top_y),
-                (right_x, bottom_y),
-                (left_x, bottom_y),
-                (left_x, top_y)
-            ], stroke="navy", fill="none", stroke_width='0.1')) 
+        dwg.add(dwg.polyline([
+            (abcissa_extrema_esquerda, coordenada_superior),
+            (abcissa_esquerda, coordenada_extrema_superior),
+            (abcissa_direita, coordenada_extrema_superior),
+            (abcissa_extrema_direita, coordenada_superior),
+            (abcissa_extrema_direita, coordenada_inferior),
+            (abcissa_direita, coordenada_extrema_inferior),
+            (abcissa_esquerda, coordenada_extrema_inferior),
+            (abcissa_extrema_esquerda, coordenada_inferior),
+            (abcissa_extrema_esquerda, coordenada_superior),
+        ], stroke="navy", fill="none", stroke_width='0.1'))

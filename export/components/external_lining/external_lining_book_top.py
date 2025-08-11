@@ -1,6 +1,3 @@
-import svgwrite
-import math
-
 class ExternalLiningBookTopComponent:
     def __init__(self, width_cm, height_cm, depth_cm, thickness_mm):
         self.box_width_mm = width_cm * 10  # convert to mm

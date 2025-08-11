@@ -1,5 +1,3 @@
-import svgwrite
-
 class ExternalLiningBaseLooseComponent:
     def __init__(self, width_cm, height_cm, depth_cm, thickness_mm):
         self.w = width_cm * 10

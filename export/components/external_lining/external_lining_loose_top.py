@@ -1,5 +1,4 @@
 import math
-import svgwrite
 
 class ExternalLiningLooseTopComponent:
     def __init__(self, width_cm, height_cm, depth_cm, thickness_mm):

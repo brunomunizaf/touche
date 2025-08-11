@@ -12,6 +12,8 @@ from export.components import CardboardBookTopComponent
 from export.components import CardboardMagnetTopComponent
 from export.components import CardboardSleeveTopComponent
 from export.components import CardboardHalfSpineTopComponent
+from export.components import CardboardCircularTopComponent
+from export.components import CardboardCircularBaseComponent
 
 # Internal Lining
 from export.components import InternalLiningLooseTopComponent
@@ -19,6 +21,8 @@ from export.components import InternalLiningBookTopComponent
 from export.components import InternalLiningMagnetTopComponent
 from export.components import InternalLiningSleeveTopComponent
 from export.components import InternalLiningHalfSpineTopComponent
+from export.components import InternalLiningCircularTopComponent
+from export.components import InternalLiningCircularBaseComponent
 
 # Internal Lining Base
 from export.components import InternalLiningBaseForLooseTopComponent
@@ -35,6 +39,8 @@ from export.components import ExternalLiningSleeveTopComponent
 from export.components import ExternalLiningBaseLooseComponent
 from export.components import ExternalLiningBaseNonLooseComponent
 from export.components import ExternalLiningHalfSpineTopComponent
+from export.components import ExternalLiningCircularTopComponent
+from export.components import ExternalLiningCircularBaseComponent
 
 st.set_page_config(
 	page_title="Touché"
@@ -57,21 +63,28 @@ if st.session_state['box_type'] is None:
     cols = st.columns(6)
     for i, (col, box_type, img) in enumerate(zip(cols, box_types, images)):
         with col:
-            st.image(img, use_container_width=True)
-            if box_type == "Tampa Luva" or box_type == "Tampa Circular":
+            st.image(img)
+            if box_type == "Tampa Luva":
                 st.button(
                     f"{box_type}",
                     key=f"select_{i}",
                     help=f"Em breve",
-                    use_container_width=True,
                     disabled=True
                 )
+            elif box_type == "Tampa Circular":
+                button_clicked = st.button(
+                    f"{box_type}",
+                    key=f"select_{i}",
+                    help=f"Clique para selecionar {box_type}"
+                )
+                if button_clicked:
+                    st.session_state['box_type'] = box_type
+                    st.rerun()
             elif box_type == "Meia Lombada":
                 button_clicked = st.button(
                     f"{box_type}",
                     key=f"select_{i}",
-                    help=f"Clique para selecionar {box_type}",
-                    use_container_width=True
+                    help=f"Clique para selecionar {box_type}"
                 )
                 if button_clicked:
                     st.session_state['box_type'] = box_type
@@ -80,8 +93,7 @@ if st.session_state['box_type'] is None:
                 button_clicked = st.button(
                     f"{box_type}",
                     key=f"select_{i}",
-                    help=f"Clique para selecionar {box_type}",
-                    use_container_width=True
+                    help=f"Clique para selecionar {box_type}"
                 )
                 if button_clicked:
                     st.session_state['box_type'] = box_type
@@ -106,21 +118,20 @@ if step == 2 and st.session_state['slot_type'] is None:
         with col:
             # Show the appropriate image first
             if slot_type == "Nenhum":
-                st.image("images/none.png", use_container_width=True)
+                st.image("images/none.png")
             elif slot_type == "Berço Quadrado":
-                st.image("images/rectangular_slot.png", use_container_width=True)
+                st.image("images/rectangular_slot.png")
             elif slot_type == "Berço Circular":
-                st.image("images/circular_slot.png", use_container_width=True)
+                st.image("images/circular_slot.png")
             elif slot_type == "Berço Cilíndrico":
-                st.image("images/cilindric_slot.png", use_container_width=True)
+                st.image("images/cilindric_slot.png")
             
             # Create a button below the image
             if slot_type == "Nenhum":
                 button_clicked = st.button(
                     f"{slot_type.replace('Berço ', '')}",
                     key=f"select_slot_{i}",
-                    help=f"Clique para selecionar {slot_type}",
-                    use_container_width=True
+                    help=f"Clique para selecionar {slot_type}"
                 )
                 if button_clicked:
                     st.session_state['slot_type'] = slot_type
@@ -130,7 +141,6 @@ if step == 2 and st.session_state['slot_type'] is None:
                     f"{slot_type.replace('Berço ', '')}",
                     key=f"select_slot_{i}",
                     help=f"Em breve",
-                    use_container_width=True,
                     disabled=True
                 )
 elif step == 2 and st.session_state['slot_type'] is not None:
@@ -150,26 +160,35 @@ if step == 3:
             placeholder="Ex: Melissa_Casamento",
             key="project_name"
         )
-        # Create 4 columns for the numeric inputs
-        col1, col2, col3, col4 = st.columns(4)
-        
-        with col1:
-            width = st.number_input(
-                "Largura (cm)", min_value=1.0, step=0.1, value=20.0, key="width")
-        
-        with col2:
-            height = st.number_input(
-                "Altura (cm)", min_value=1.0, step=0.1, value=15.0, key="height")
-        
-        with col3:
-            depth = st.number_input(
-                "Profundidade (cm)", min_value=1.0, step=0.1, value=10.0, key="depth")
-        
-        with col4:
-            thickness = st.number_input(
-                "Espessura (mm)", min_value=0.5, step=0.1, value=1.9, key="thickness")
+        box_type = st.session_state['box_type']
+        if box_type == "Tampa Circular":
+            col1, col2 = st.columns(2)
+            with col1:
+                box_diameter = st.number_input(
+                    "Diâmetro da caixa (cm)", min_value=1.0, step=0.1, value=20.0, key="circular_box_diameter")
+            with col2:
+                box_depth = st.number_input(
+                    "Profundidade da caixa (cm)", min_value=1.0, step=0.1, value=10.0, key="circular_box_depth")
+        else:
+            # Create 4 columns for the numeric inputs
+            col1, col2, col3, col4 = st.columns(4)
 
-        
+            with col1:
+                width = st.number_input(
+                    "Largura (cm)", min_value=1.0, step=0.1, value=20.0, key="width")
+
+            with col2:
+                height = st.number_input(
+                    "Altura (cm)", min_value=1.0, step=0.1, value=15.0, key="height")
+
+            with col3:
+                depth = st.number_input(
+                    "Profundidade (cm)", min_value=1.0, step=0.1, value=10.0, key="depth")
+
+            with col4:
+                thickness = st.number_input(
+                    "Espessura (mm)", min_value=0.5, step=0.1, value=1.9, key="thickness")
+
         # Slot configuration options
         selected_slot_type = st.session_state.get('slot_type', 'Nenhum')
         
@@ -197,13 +216,15 @@ if step == 3:
 # Step 4: Show relevant export options
 if step == 3:
     st.header("4. Exportar linhas de corte")
-    box = Box(
-        st.session_state['project_name'],
-        st.session_state['width'],
-        st.session_state['height'],
-        st.session_state['depth'],
-        st.session_state['thickness']
-    )
+    # Only create Box object for non-circular box types
+    if box_type != "Tampa Circular":
+        box = Box(
+            st.session_state['project_name'],
+            st.session_state['width'],
+            st.session_state['height'],
+            st.session_state['depth'],
+            st.session_state['thickness']
+        )
     # Only show relevant options for the selected box type
     if box_type == "Tampa Solta":
         def merged_export():
@@ -641,6 +662,79 @@ if step == 3:
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
+    elif box_type == "Tampa Circular":
+        def circular_export():
+            top = CardboardCircularTopComponent(
+                st.session_state['circular_box_diameter']
+            )
+            base = CardboardCircularBaseComponent(
+                st.session_state['circular_box_diameter'],
+                st.session_state['circular_box_depth']
+            )
+            layout = BoxLayout([top, base], spacing=20)
+            svg_width = max(top.total_width, base.total_width)
+            svg_height = top.total_height + base.total_height + layout.spacing
+            exporter = SVGExporter(svg_width, svg_height)
+            for comp, x, y in layout.arrange():
+                exporter.add_component(comp, x, y)
+            buffer = io.StringIO()
+            exporter.dwg.write(buffer)
+            return buffer.getvalue()
+        st.download_button(
+            label="🟠 Papelão (Base + Tampa Circular)",
+            data=circular_export(),
+            file_name=f"{st.session_state['project_name']} | Papelão - Base + Tampa Circular.svg",
+            mime="image/svg+xml",
+            disabled=not st.session_state['project_name']
+        )
+        def circular_internal_lining_export():
+            top = InternalLiningCircularTopComponent(
+                st.session_state['circular_box_diameter']
+            )
+            base = InternalLiningCircularBaseComponent(
+                st.session_state['circular_box_diameter'],
+                st.session_state['circular_box_depth']
+            )
+            layout = BoxLayout([top, base], spacing=20)
+            svg_width = max(top.total_width, base.total_width)
+            svg_height = top.total_height + base.total_height + layout.spacing
+            exporter = SVGExporter(svg_width, svg_height)
+            for comp, x, y in layout.arrange():
+                exporter.add_component(comp, x, y)
+            buffer = io.StringIO()
+            exporter.dwg.write(buffer)
+            return buffer.getvalue()
+        st.download_button(
+            label="📩 Revestimento Interno (Base + Tampa Circular)",
+            data=circular_internal_lining_export(),
+            file_name=f"{st.session_state['project_name']} | Revestimento Interno - Base + Tampa Circular.svg",
+            mime="image/svg+xml",
+            disabled=not st.session_state['project_name']
+        )
+        def circular_external_lining_export():
+            top = ExternalLiningCircularTopComponent(
+                st.session_state['circular_box_diameter']
+            )
+            base = ExternalLiningCircularBaseComponent(
+                st.session_state['circular_box_diameter'],
+                st.session_state['circular_box_depth']
+            )
+            layout = BoxLayout([top, base], spacing=20)
+            svg_width = max(top.total_width, base.total_width)
+            svg_height = top.total_height + base.total_height + layout.spacing
+            exporter = SVGExporter(svg_width, svg_height)
+            for comp, x, y in layout.arrange():
+                exporter.add_component(comp, x, y)
+            buffer = io.StringIO()
+            exporter.dwg.write(buffer)
+            return buffer.getvalue()
+        st.download_button(
+            label="🎁 Revestimento Externo (Base + Tampa Circular)",
+            data=circular_external_lining_export(),
+            file_name=f"{st.session_state['project_name']} | Revestimento Externo - Base + Tampa Circular.svg",
+            mime="image/svg+xml",
+            disabled=not st.session_state['project_name']
+        )
 
     # New section for multiple instance exports (temporarily disabled)
     st.header("5. Exportar otimização")
@@ -722,6 +816,21 @@ if step == 3:
                 ExternalLiningBaseNonLooseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
                 ExternalLiningHalfSpineTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
             )
+        }
+    elif box_type == "Tampa Circular":
+        export_functions = {
+            "Papelão - Base + Tampa Circular": lambda: [
+                CardboardCircularTopComponent(st.session_state['circular_box_diameter']),
+                CardboardCircularBaseComponent(st.session_state['circular_box_diameter'], st.session_state['circular_box_depth'])
+            ],
+            "Revestimento Interno - Base + Tampa Circular": lambda: [
+                InternalLiningCircularTopComponent(st.session_state['circular_box_diameter']),
+                InternalLiningCircularBaseComponent(st.session_state['circular_box_diameter'], st.session_state['circular_box_depth'])
+            ],
+            "Revestimento Externo - Base + Tampa Circular": lambda: [
+                ExternalLiningCircularTopComponent(st.session_state['circular_box_diameter']),
+                ExternalLiningCircularBaseComponent(st.session_state['circular_box_diameter'], st.session_state['circular_box_depth'])
+            ]
         }
     
     # Dropdown to select export type
