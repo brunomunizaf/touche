@@ -33,12 +33,12 @@ from export.components import InternalLiningBaseForHalfSpineTopComponent
 
 # External Lining
 from export.components import ExternalLiningBookTopComponent
-from export.components import ExternalLiningMagnetTopComponent
+from export.components import ExternalLiningDoubleMagnetTopComponent
 from export.components import ExternalLiningLooseTopComponent
 from export.components import ExternalLiningSleeveTopComponent
 from export.components import ExternalLiningBaseLooseComponent
 from export.components import ExternalLiningBaseNonLooseComponent
-from export.components import ExternalLiningHalfSpineTopComponent
+from export.components import ExternalLiningSingleMagnetTopComponent
 from export.components import ExternalLiningCircularTopComponent
 from export.components import ExternalLiningCircularBaseComponent
 
@@ -58,7 +58,7 @@ st.title("🗺️ Linhas de corte e vinco | Touché")
 step = 1
 if st.session_state['box_type'] is None:
     st.header("1. Qual tipo de caixa você quer construir?")
-    box_types = ["Tampa Solta", "Tampa Livro", "Tampa Imã", "Tampa Luva", "Meia Lombada", "Tampa Circular"]
+    box_types = ["Tampa Solta", "Tampa Livro", "Tampa Imã Dupla", "Tampa Luva", "Tampa Imã Simples", "Tampa Circular"]
     images = ["images/lose_box.png", "images/book_box.png", "images/magnet_box.png", "images/sleeve_box.png", "images/half_spine_box.png", "images/circular_box.png"]
     cols = st.columns(6)
     for i, (col, box_type, img) in enumerate(zip(cols, box_types, images)):
@@ -80,7 +80,7 @@ if st.session_state['box_type'] is None:
                 if button_clicked:
                     st.session_state['box_type'] = box_type
                     st.rerun()
-            elif box_type == "Meia Lombada":
+            elif box_type == "Tampa Imã Simples":
                 button_clicked = st.button(
                     f"{box_type}",
                     key=f"select_{i}",
@@ -388,7 +388,7 @@ if step == 3:
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
-    elif box_type == "Tampa Imã":
+    elif box_type == "Tampa Imã Dupla":
         def merged_magnet_export():
             thickness = st.session_state['thickness']
             top = CardboardMagnetTopComponent(
@@ -414,9 +414,9 @@ if step == 3:
             exporter.dwg.write(buffer)
             return buffer.getvalue()
         st.download_button(
-            label="📦 Papelão (Base + Tampa Imã)",
+            label="📦 Papelão (Base + Tampa Imã Dupla)",
             data=merged_magnet_export(),
-            file_name=f"{st.session_state['project_name']} | Papelão - Base + Tampa Imã.svg",
+            file_name=f"{st.session_state['project_name']} | Papelão - Base + Tampa Imã Dupla.svg",
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
@@ -444,15 +444,15 @@ if step == 3:
             exporter.dwg.write(buffer)
             return buffer.getvalue()
         st.download_button(
-            label="📩 Revestimento Interno (Base + Tampa Imã)",
+            label="📩 Revestimento Interno (Base + Tampa Imã Dupla)",
             data=merged_magnet_internal_lining_export(),
-            file_name=f"{st.session_state['project_name']} | Revestimento Interno - Base + Tampa Imã.svg",
+            file_name=f"{st.session_state['project_name']} | Revestimento Interno - Base + Tampa Imã Dupla.svg",
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
         def merged_magnet_external_lining_export():
             thickness = st.session_state['thickness']
-            top = ExternalLiningMagnetTopComponent(
+            top = ExternalLiningDoubleMagnetTopComponent(
                 st.session_state['width'],
                 st.session_state['height'],
                 st.session_state['depth'],
@@ -474,9 +474,9 @@ if step == 3:
             exporter.dwg.write(buffer)
             return buffer.getvalue()
         st.download_button(
-            label="🎁 Revestimento Externo (Base + Tampa Imã)",
+            label="🎁 Revestimento Externo (Base + Tampa Imã Dupla)",
             data=merged_magnet_external_lining_export(),
-            file_name=f"{st.session_state['project_name']} | Revestimento Externo - Base + Tampa Imã.svg",
+            file_name=f"{st.session_state['project_name']} | Revestimento Externo - Base + Tampa Imã Dupla.svg",
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
@@ -571,7 +571,7 @@ if step == 3:
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
-    elif box_type == "Meia Lombada":
+    elif box_type == "Tampa Imã Simples":
         def merged_half_spine_export():
             thickness = st.session_state['thickness']
             top = CardboardHalfSpineTopComponent(
@@ -596,9 +596,9 @@ if step == 3:
             exporter.dwg.write(buffer)
             return buffer.getvalue()
         st.download_button(
-            label="📦 Papelão (Base + Meia Lombada)",
+            label="📦 Papelão (Base + Tampa Imã Simples)",
             data=merged_half_spine_export(),
-            file_name=f"{st.session_state['project_name']} | Papelão - Base + Meia Lombada.svg",
+            file_name=f"{st.session_state['project_name']} | Papelão - Base + Tampa Imã Simples.svg",
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
@@ -626,15 +626,15 @@ if step == 3:
             exporter.dwg.write(buffer)
             return buffer.getvalue()
         st.download_button(
-            label="📩 Revestimento Interno (Base + Meia Lombada)",
+            label="📩 Revestimento Interno (Base + Tampa Imã Simples)",
             data=merged_half_spine_internal_lining_export(),
-            file_name=f"{st.session_state['project_name']} | Revestimento Interno - Base + Meia Lombada.svg",
+            file_name=f"{st.session_state['project_name']} | Revestimento Interno - Base + Tampa Imã Simples.svg",
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
         def merged_half_spine_external_lining_export():
             thickness = st.session_state['thickness']
-            top = ExternalLiningHalfSpineTopComponent(
+            top = ExternalLiningSingleMagnetTopComponent(
                 st.session_state['width'],
                 st.session_state['height'],
                 st.session_state['depth'],
@@ -656,9 +656,9 @@ if step == 3:
             exporter.dwg.write(buffer)
             return buffer.getvalue()
         st.download_button(
-            label="🎁 Revestimento Externo (Base + Meia Lombada)",
+            label="🎁 Revestimento Externo (Base + Tampa Imã Simples)",
             data=merged_half_spine_external_lining_export(),
-            file_name=f"{st.session_state['project_name']} | Revestimento Externo - Base + Meia Lombada.svg",
+            file_name=f"{st.session_state['project_name']} | Revestimento Externo - Base + Tampa Imã Simples.svg",
             mime="image/svg+xml",
             disabled=not st.session_state['project_name']
         )
@@ -772,19 +772,19 @@ if step == 3:
                 ExternalLiningBookTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
             )
         }
-    elif box_type == "Tampa Imã":
+    elif box_type == "Tampa Imã Dupla":
         export_functions = {
-            "Papelão - Base + Tampa Imã": lambda: (
+            "Papelão - Base + Tampa Imã Dupla": lambda: (
                 CardboardBaseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'], with_magnets=True),
                 CardboardMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
             ),
-            "Revestimento Interno - Base + Tampa Imã": lambda: (
+            "Revestimento Interno - Base + Tampa Imã Dupla": lambda: (
                 InternalLiningBaseForMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
                 InternalLiningMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
             ),
-            "Revestimento Externo - Base + Tampa Imã": lambda: (
+            "Revestimento Externo - Base + Tampa Imã Dupla": lambda: (
                 ExternalLiningBaseNonLooseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
-                ExternalLiningMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
+                ExternalLiningDoubleMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
             )
         }
     elif box_type == "Tampa Luva":
@@ -802,19 +802,19 @@ if step == 3:
                 ExternalLiningSleeveTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
             )
         }
-    elif box_type == "Meia Lombada":
+    elif box_type == "Tampa Imã Simples":
         export_functions = {
-            "Papelão - Base + Meia Lombada": lambda: (
+            "Papelão - Base + Tampa Imã Simples": lambda: (
                 CardboardBaseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
                 CardboardHalfSpineTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
             ),
-            "Revestimento Interno - Base + Meia Lombada": lambda: (
+            "Revestimento Interno - Base + Tampa Imã Simples": lambda: (
                 InternalLiningBaseForHalfSpineTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
                 InternalLiningHalfSpineTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
             ),
-            "Revestimento Externo - Base + Meia Lombada": lambda: (
+            "Revestimento Externo - Base + Tampa Imã Simples": lambda: (
                 ExternalLiningBaseNonLooseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
-                ExternalLiningHalfSpineTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
+                ExternalLiningSingleMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
             )
         }
     elif box_type == "Tampa Circular":

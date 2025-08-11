@@ -1,4 +1,4 @@
-class ExternalLiningMagnetTopComponent:
+class ExternalLiningDoubleMagnetTopComponent:
     def __init__(self, width_cm, height_cm, depth_cm, thickness_mm):
         self.largura = width_cm * 10
         self.altura = height_cm * 10
@@ -33,9 +33,9 @@ class ExternalLiningMagnetTopComponent:
         abcissa_direita = abcissa_extrema_direita - 2 * self.espaco_sacado
 
         coordenada_extrema_inferior = y_offset
-        coordenada_inferior = coordenada_extrema_inferior + 2 * self.espaco_sacado
+        coordenada_inferior = coordenada_extrema_inferior + self.espaco_sacado
         coordenada_extrema_superior = coordenada_inferior + self.altura_do_papelao_com_espacamentos + self.espaco_sacado
-        coordenada_superior = coordenada_extrema_superior - 2 * self.espaco_sacado
+        coordenada_superior = coordenada_extrema_superior - self.espaco_sacado
 
         dwg.add(dwg.polyline([
             (abcissa_extrema_esquerda, coordenada_superior),
