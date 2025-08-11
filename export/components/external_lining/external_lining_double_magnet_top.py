@@ -37,14 +37,16 @@ class ExternalLiningDoubleMagnetTopComponent:
         coordenada_extrema_superior = coordenada_inferior + self.altura_do_papelao_com_espacamentos + self.espaco_sacado
         coordenada_superior = coordenada_extrema_superior - self.espaco_sacado
 
+        retracao = 10
+
         dwg.add(dwg.polyline([
-            (abcissa_extrema_esquerda, coordenada_superior - self.espaco_sacado),
-            (abcissa_esquerda, coordenada_extrema_superior),
-            (abcissa_direita, coordenada_extrema_superior),
-            (abcissa_extrema_direita, coordenada_superior - self.espaco_sacado),
-            (abcissa_extrema_direita, coordenada_inferior + self.espaco_sacado),
-            (abcissa_direita, coordenada_extrema_inferior),
-            (abcissa_esquerda, coordenada_extrema_inferior),
-            (abcissa_extrema_esquerda, coordenada_inferior + self.espaco_sacado),
-            (abcissa_extrema_esquerda, coordenada_superior - self.espaco_sacado),
+            (abcissa_extrema_esquerda, coordenada_superior - retracao),
+            (abcissa_esquerda - retracao/2, coordenada_extrema_superior),
+            (abcissa_direita + retracao/2, coordenada_extrema_superior),
+            (abcissa_extrema_direita, coordenada_superior - retracao),
+            (abcissa_extrema_direita, coordenada_inferior + retracao),
+            (abcissa_direita + retracao/2, coordenada_extrema_inferior),
+            (abcissa_esquerda - retracao/2, coordenada_extrema_inferior),
+            (abcissa_extrema_esquerda, coordenada_inferior + retracao),
+            (abcissa_extrema_esquerda, coordenada_superior - retracao),
         ], stroke="navy", fill="none", stroke_width='0.1'))
