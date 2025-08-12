@@ -1,6 +1,3 @@
-import svgwrite
-import math
-
 class InternalLiningBaseComponent:
     def __init__(self, width_cm, height_cm, depth_cm, thickness_mm):
         self.width = width_cm * 10  # convert to mm

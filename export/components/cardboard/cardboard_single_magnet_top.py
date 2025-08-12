@@ -70,9 +70,9 @@ class CardboardSingleMagnetTopComponent:
         if largura + self.folga > 100:
             xLM, xRM = self._calcular_abcissa_ima(abcissa_extrema_esquerda + (self.folga/2), abcissa_extrema_direita - (self.folga/2), largura)
             yM = coordenada_superior_terceiro_retangulo - 30 if self.profundidade >= 100 else coordenada_superior_terceiro_retangulo - (self.profundidade - 5) / 2
-            dwg.add(dwg.circle(center=(xLM, yM), r=self.raio_do_ima, fill="none", stroke="black", stroke_width=0.1))
-            dwg.add(dwg.circle(center=(xRM, yM), r=self.raio_do_ima, fill="none", stroke="black", stroke_width=0.1))
+            dwg.add(dwg.circle(center=(xLM, yM), r=self.raio_do_ima, fill="none", stroke="red", stroke_width=0.1))
+            dwg.add(dwg.circle(center=(xRM, yM), r=self.raio_do_ima, fill="none", stroke="red", stroke_width=0.1))
         else:
             xM = abcissa_extrema_esquerda + (abcissa_extrema_direita - abcissa_extrema_esquerda) / 2
             yM = coordenada_superior_terceiro_retangulo - (self.profundidade - 5) / 2
-            dwg.add(dwg.circle(center=(xM, yM), r=self.raio_do_ima, fill="none", stroke="black", stroke_width=0.1))
+            dwg.add(dwg.circle(center=(xM, yM), r=self.raio_do_ima, fill="none", stroke="red", stroke_width=0.1))

@@ -1,6 +1,3 @@
-import svgwrite
-import math
-
 class InternalLiningBaseForSingleMagnetTopComponent:
     def __init__(self, width_cm, height_cm, depth_cm, thickness_mm):
         self.width = width_cm * 10  # convert to mm
@@ -11,7 +8,7 @@ class InternalLiningBaseForSingleMagnetTopComponent:
 
     def _compute_size(self):
         self._total_width = self.width + 2 * self.depth
-        self._total_height = self.height + self.depth + (self.depth / 2)
+        self._total_height = self.height + 2 * self.depth
 
     @property
     def total_width(self):
@@ -26,11 +23,10 @@ class InternalLiningBaseForSingleMagnetTopComponent:
         main_right_x = main_left_x + self.width
         main_bottom_y = self.depth + y_offset
         main_top_y = main_bottom_y + self.height
-        half_spine = self.depth / 2
         flap_left_x = (main_left_x - self.depth) + 0.5
         flap_right_x = (main_right_x + self.depth) - 0.5
         flap_bottom_y = (main_bottom_y - self.depth) + 0.5
-        flap_top_y = (main_top_y + half_spine) - 0.5
+        flap_top_y = (main_top_y + self.depth) - 0.5
         t = self.thickness
         clearance = 15
 
@@ -40,12 +36,12 @@ class InternalLiningBaseForSingleMagnetTopComponent:
 
         path.push("L", 
                   main_left_x - t, main_top_y, 
-                  main_left_x - t, main_top_y + half_spine / 2, 
-                  main_left_x, main_top_y + half_spine / 2, 
+                  main_left_x - t, main_top_y + self.depth / 2, 
+                  main_left_x, main_top_y + self.depth / 2, 
                   main_left_x, flap_top_y + clearance,
                   main_right_x, flap_top_y + clearance, 
-                  main_right_x, main_top_y + half_spine / 2, 
-                  main_right_x + t, main_top_y + half_spine / 2, 
+                  main_right_x, main_top_y + self.depth / 2, 
+                  main_right_x + t, main_top_y + self.depth / 2, 
                   main_right_x + t, main_top_y, 
                   main_right_x, main_top_y
                   )

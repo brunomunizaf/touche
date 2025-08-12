@@ -1,4 +1,3 @@
-import svgwrite
 import math
 
 class InternalLiningSleeveTopComponent:

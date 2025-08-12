@@ -32,4 +32,3 @@ from .external_lining.external_lining_base_non_loose import ExternalLiningBaseNo
 from .external_lining.external_lining_single_magnet_top import ExternalLiningSingleMagnetTopComponent
 from .external_lining.external_lining_circular_top import ExternalLiningCircularTopComponent
 from .external_lining.external_lining_circular_base import ExternalLiningCircularBaseComponent
-

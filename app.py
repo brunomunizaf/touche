@@ -584,7 +584,8 @@ if step == 3:
                 st.session_state['width'],
                 st.session_state['height'],
                 st.session_state['depth'],
-                thickness
+                thickness,
+                with_magnets=True
             )
             layout = BoxLayout([top, base], spacing=20)
             svg_width = max(top.total_width, base.total_width)

@@ -100,8 +100,8 @@ class CardboardBaseComponent:
             
             if self.width + 15 > 100:
                 xL, xR = self.get_magnets_x(main_left_x, main_right_x, self.width)
-                self.draw_magnet(xL, yM, magnet_radius, dwg, 'red')
-                self.draw_magnet(xR, yM, magnet_radius, dwg, 'red')
+                self.draw_magnet(xL, yM, magnet_radius, dwg, 'black')
+                self.draw_magnet(xR, yM, magnet_radius, dwg, 'black')
             else:
                 xM = main_left_x + (main_right_x - main_left_x) / 2
-                self.draw_magnet(xM, yM, magnet_radius, dwg, 'red') 
+                self.draw_magnet(xM, yM, magnet_radius, dwg, 'black') 
