@@ -21,8 +21,8 @@ from export.components import InternalLiningBookTopComponent
 from export.components import InternalLiningDoubleMagnetTopComponent
 from export.components import InternalLiningSleeveTopComponent
 from export.components import InternalLiningSingleMagnetTopComponent
-from export.components import InternalLiningCircularTopComponent
-from export.components import InternalLiningCircularBaseComponent
+from export.components import InternalLiningCircularTopLidComponent, InternalLiningCircularTopWallComponent
+from export.components import InternalLiningCircularBaseLidComponent, InternalLiningCircularBaseWallComponent
 
 # Internal Lining Base
 from export.components import InternalLiningBaseForLooseTopComponent
@@ -700,16 +700,22 @@ if step == 3:
             disabled=not st.session_state['project_name']
         )
         def circular_internal_lining_export():
-            top = InternalLiningCircularTopComponent(
+            top_lid = InternalLiningCircularTopLidComponent(
                 st.session_state['circular_box_diameter']
             )
-            base = InternalLiningCircularBaseComponent(
+            top_wall = InternalLiningCircularTopWallComponent(
+                st.session_state['circular_box_diameter']
+            )
+            base_lid = InternalLiningCircularBaseLidComponent(
+                st.session_state['circular_box_diameter']
+            )
+            base_wall = InternalLiningCircularBaseWallComponent(
                 st.session_state['circular_box_diameter'],
                 st.session_state['circular_box_depth']
             )
-            layout = BoxLayout([top, base], spacing=20)
-            svg_width = max(top.total_width, base.total_width)
-            svg_height = top.total_height + base.total_height + layout.spacing
+            layout = BoxLayout([top_lid, top_wall, base_lid, base_wall], spacing=20)
+            svg_width = max(top_lid.total_width, top_wall.total_width, base_lid.total_width, base_wall.total_width)
+            svg_height = top_lid.total_height + top_wall.total_height + base_lid.total_height + base_wall.total_height + (layout.spacing * 3)
             exporter = SVGExporter(svg_width, svg_height)
             for comp, x, y in layout.arrange():
                 exporter.add_component(comp, x, y)
@@ -838,8 +844,10 @@ if step == 3:
                 CardboardCircularBaseWallComponent(st.session_state['circular_box_diameter'], st.session_state['circular_box_depth'])
             ],
             "Revestimento Interno - Base + Tampa Circular": lambda: [
-                InternalLiningCircularTopComponent(st.session_state['circular_box_diameter']),
-                InternalLiningCircularBaseComponent(st.session_state['circular_box_diameter'], st.session_state['circular_box_depth'])
+                InternalLiningCircularTopLidComponent(st.session_state['circular_box_diameter']),
+                InternalLiningCircularTopWallComponent(st.session_state['circular_box_diameter']),
+                InternalLiningCircularBaseLidComponent(st.session_state['circular_box_diameter']),
+                InternalLiningCircularBaseWallComponent(st.session_state['circular_box_diameter'], st.session_state['circular_box_depth'])
             ],
             "Revestimento Externo - Base + Tampa Circular": lambda: [
                 ExternalLiningCircularTopComponent(st.session_state['circular_box_diameter']),

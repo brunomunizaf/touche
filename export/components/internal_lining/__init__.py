@@ -1,1 +1,6 @@
 # Este arquivo marca o diretório como um módulo Python válido
+
+from .internal_lining_circular_base_wall import InternalLiningCircularBaseWallComponent
+from .internal_lining_circular_top_wall import InternalLiningCircularTopWallComponent
+from .internal_lining_circular_top_lid import InternalLiningCircularTopLidComponent
+from .internal_lining_circular_base_lid import InternalLiningCircularBaseLidComponent
