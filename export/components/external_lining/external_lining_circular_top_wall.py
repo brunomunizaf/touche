@@ -3,6 +3,7 @@ import math
 class ExternalLiningCircularTopWallComponent:
     def __init__(self, box_diameter_cm):
         self.diametro = (box_diameter_cm * 10) + 5
+        self.profundidade = 20
         self._compute_size()
 
     def _compute_size(self):
