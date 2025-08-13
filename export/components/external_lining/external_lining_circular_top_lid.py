@@ -12,7 +12,7 @@ class ExternalLiningCircularTopLidComponent:
         centro = (x_offset + self.raio, y_offset + self.raio)
         dwg.add(dwg.circle(
             center=centro, 
-            r=self.radius, 
+            r=self.raio, 
             stroke="navy", 
             fill="none", 
             stroke_width=0.1
