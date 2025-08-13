@@ -19,7 +19,7 @@ class InternalLiningCircularTopWallComponent:
             dwg.rect(
                 insert=(x_offset, y_offset), 
                 size=(self.largura, self.altura), 
-                stroke="black", 
+                stroke="navy", 
                 fill="none", 
                 stroke_width=0.1
             )

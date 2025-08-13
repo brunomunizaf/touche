@@ -14,7 +14,7 @@ class InternalLiningCircularTopLidComponent:
             dwg.circle(
                 center=centro, 
                 r=self.raio, 
-                stroke="black", 
+                stroke="navy", 
                 fill="none", 
                 stroke_width=0.1
             )
