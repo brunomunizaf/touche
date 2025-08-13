@@ -39,8 +39,8 @@ from export.components import ExternalLiningSleeveTopComponent
 from export.components import ExternalLiningBaseLooseComponent
 from export.components import ExternalLiningBaseNonLooseComponent
 from export.components import ExternalLiningSingleMagnetTopComponent
-from export.components import ExternalLiningCircularTopComponent
-from export.components import ExternalLiningCircularBaseComponent
+from export.components import ExternalLiningCircularTopLidComponent, ExternalLiningCircularTopWallComponent
+from export.components import ExternalLiningCircularBaseLidComponent, ExternalLiningCircularBaseWallComponent
 
 st.set_page_config(
 	page_title="Touché"
@@ -730,16 +730,22 @@ if step == 3:
             disabled=not st.session_state['project_name']
         )
         def circular_external_lining_export():
-            top = ExternalLiningCircularTopComponent(
+            top_lid = ExternalLiningCircularTopLidComponent(
                 st.session_state['circular_box_diameter']
             )
-            base = ExternalLiningCircularBaseComponent(
+            top_wall = ExternalLiningCircularTopWallComponent(
+                st.session_state['circular_box_diameter']
+            )
+            base_lid = ExternalLiningCircularBaseLidComponent(
+                st.session_state['circular_box_diameter']
+            )
+            base_wall = ExternalLiningCircularBaseWallComponent(
                 st.session_state['circular_box_diameter'],
                 st.session_state['circular_box_depth']
             )
-            layout = BoxLayout([top, base], spacing=20)
-            svg_width = max(top.total_width, base.total_width)
-            svg_height = top.total_height + base.total_height + layout.spacing
+            layout = BoxLayout([top_lid, top_wall, base_lid, base_wall], spacing=20)
+            svg_width = max(top_lid.total_width, top_wall.total_width, base_lid.total_width, base_wall.total_width)
+            svg_height = top_lid.total_height + top_wall.total_height + base_lid.total_height + base_wall.total_height + (layout.spacing * 3)
             exporter = SVGExporter(svg_width, svg_height)
             for comp, x, y in layout.arrange():
                 exporter.add_component(comp, x, y)
@@ -850,8 +856,10 @@ if step == 3:
                 InternalLiningCircularBaseWallComponent(st.session_state['circular_box_diameter'], st.session_state['circular_box_depth'])
             ],
             "Revestimento Externo - Base + Tampa Circular": lambda: [
-                ExternalLiningCircularTopComponent(st.session_state['circular_box_diameter']),
-                ExternalLiningCircularBaseComponent(st.session_state['circular_box_diameter'], st.session_state['circular_box_depth'])
+                ExternalLiningCircularTopLidComponent(st.session_state['circular_box_diameter']),
+                ExternalLiningCircularTopWallComponent(st.session_state['circular_box_diameter']),
+                ExternalLiningCircularBaseLidComponent(st.session_state['circular_box_diameter']),
+                ExternalLiningCircularBaseWallComponent(st.session_state['circular_box_diameter'], st.session_state['circular_box_depth'])
             ]
         }
     

@@ -1,1 +1,6 @@
 # Este arquivo marca o diretório como um módulo Python válido
+
+from .external_lining_circular_base_wall import ExternalLiningCircularBaseWallComponent
+from .external_lining_circular_top_wall import ExternalLiningCircularTopWallComponent
+from .external_lining_circular_top_lid import ExternalLiningCircularTopLidComponent
+from .external_lining_circular_base_lid import ExternalLiningCircularBaseLidComponent
