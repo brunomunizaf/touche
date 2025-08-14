@@ -49,11 +49,43 @@ class ExternalLiningCircularTopLidComponent:
 
     def draw(self, dwg, x_offset, y_offset):
         centro = (x_offset + self.raio, y_offset + self.raio)
-        dwg.add(dwg.circle(
-            center=centro, 
-            r=self.raio, 
-            stroke="navy", 
-            fill="none", 
-            stroke_width=0.1
-        ))
-        self._desenhar_palitos(dwg, centro, self.raio)
+        
+        # Criar um único path que inclui o círculo e os palitinhos
+        path = dwg.path(stroke="navy", fill="none", stroke_width=0.1)
+        
+        # Desenhar o círculo principal usando comandos de path
+        # Usar comando de arco para criar um círculo perfeito
+        raio = self.raio
+        cx, cy = centro
+        
+        # Mover para o ponto inicial (direita do círculo)
+        path.push("M", cx + raio, cy)
+        
+        # Desenhar o círculo usando dois arcos de 180 graus
+        # Arco superior (direita para esquerda)
+        path.push("A", raio, raio, 0, 1, 0, cx - raio, cy)
+        # Arco inferior (esquerda para direita)
+        path.push("A", raio, raio, 0, 1, 0, cx + raio, cy)
+        
+        # Adicionar os palitinhos ao mesmo path
+        angulo_inicial = 0
+        angulo_incremento = 2 * math.pi / self.numero_palitos
+        
+        for i in range(self.numero_palitos):
+            # Calcular posição do palito
+            angulo = angulo_inicial + (i * angulo_incremento)
+            
+            # Ponto inicial do palito (na circunferência)
+            x_inicio = centro[0] + (self.raio * math.cos(angulo))
+            y_inicio = centro[1] + (self.raio * math.sin(angulo))
+            
+            # Ponto final do palito (interno, apontando para o centro)
+            x_fim = centro[0] + ((self.raio - self.altura_palito) * math.cos(angulo))
+            y_fim = centro[1] + ((self.raio - self.altura_palito) * math.sin(angulo))
+            
+            # Adicionar palito ao path
+            path.push("M", x_inicio, y_inicio)  # Mover para o início do palito
+            path.push("L", x_fim, y_fim)        # Linha para o fim do palito
+        
+        # Adicionar o path completo ao desenho
+        dwg.add(path)

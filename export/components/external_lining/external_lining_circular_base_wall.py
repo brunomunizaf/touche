@@ -60,16 +60,58 @@ class ExternalLiningCircularBaseWallComponent:
             ))
 
     def draw(self, dwg, x_offset, y_offset):
-        # Desenhar o retângulo principal
-        dwg.add(dwg.rect(
-            insert=(x_offset, y_offset), 
-            size=(self.largura, self.altura), 
-            stroke="navy", 
-            fill="none", 
-            stroke_width=0.1
-        ))
+        # Criar um único path que inclui o retângulo e os palitinhos
+        path = dwg.path(stroke="navy", fill="none", stroke_width=0.1)
         
-        # Desenhar palitinhos apenas em dois lados não consecutivos
-        # Lado superior e lado inferior (não consecutivos)
-        self._desenhar_palitos_lado(dwg, x_offset, y_offset, "superior")
-        self._desenhar_palitos_lado(dwg, x_offset, y_offset, "inferior")
+        # Coordenadas do retângulo
+        x1, y1 = x_offset, y_offset
+        x2, y2 = x_offset + self.largura, y_offset + self.altura
+        
+        # Desenhar o retângulo principal usando comandos de path
+        path.push("M", x1, y1)  # Mover para o canto superior esquerdo
+        path.push("L", x2, y1)  # Linha para o canto superior direito
+        path.push("L", x2, y2)  # Linha para o canto inferior direito
+        path.push("L", x1, y2)  # Linha para o canto inferior esquerdo
+        path.push("Z")           # Fechar o retângulo
+        
+        # Adicionar os palitinhos ao mesmo path
+        margem_borda = 10
+        x_inicio_palitos = x_offset + margem_borda
+        x_fim_palitos = x_inicio_palitos + self.largura
+        area_disponivel = x_fim_palitos - x_inicio_palitos
+        numero_palitos_ajustado = int(area_disponivel / (self.espaco_entre_palitos + self.largura_palito))
+        
+        # Desenhar palitinhos SUPERIORES como parte do mesmo path
+        for i in range(numero_palitos_ajustado):
+            x_pos = x_inicio_palitos + (i * (self.espaco_entre_palitos + self.largura_palito))
+            
+            # Ponto inicial do palito (na borda superior)
+            x_inicio = x_pos
+            y_inicio = y_offset
+            
+            # Ponto final do palito (apontando para baixo)
+            x_fim = x_pos
+            y_fim = y_offset + self.altura_palito
+            
+            # Adicionar palito ao path
+            path.push("M", x_inicio, y_inicio)  # Mover para o início do palito
+            path.push("L", x_fim, y_fim)        # Linha para o fim do palito
+        
+        # Desenhar palitinhos INFERIORES como parte do mesmo path
+        for i in range(numero_palitos_ajustado):
+            x_pos = x_inicio_palitos + (i * (self.espaco_entre_palitos + self.largura_palito))
+            
+            # Ponto inicial do palito (na borda inferior)
+            x_inicio = x_pos
+            y_inicio = y_offset + self.altura
+            
+            # Ponto final do palito (apontando para cima)
+            x_fim = x_pos
+            y_fim = (y_offset + self.altura) - self.altura_palito
+            
+            # Adicionar palito ao path
+            path.push("M", x_inicio, y_inicio)  # Mover para o início do palito
+            path.push("L", x_fim, y_fim)        # Linha para o fim do palito
+        
+        # Adicionar o path completo ao desenho
+        dwg.add(path)
