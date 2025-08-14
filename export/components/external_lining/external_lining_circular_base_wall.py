@@ -16,8 +16,51 @@ class ExternalLiningCircularBaseWallComponent:
 
         self.total_width = self.largura
         self.total_height = self.altura
+        
+        # Calcular quantos palitinhos cabem ao longo da largura da parede
+        self.perimetro_lado = self.largura
+        self.espaco_entre_palitos = 10  # 10mm entre cada palito
+        self.largura_palito = 0.1
+        self.numero_palitos_por_lado = int(self.perimetro_lado / (self.espaco_entre_palitos + self.largura_palito))
+
+    def _desenhar_palitos_lado(self, dwg, x_offset, y_offset, lado):
+        """Desenha palitinhos em um lado específico"""
+        if lado == "superior":
+            # Lado superior - palitinhos apontam para baixo
+            x_base = x_offset + self.espaco_entre_papelao_e_palitos
+            y_base = y_offset
+            direcao = 1  # para baixo
+        elif lado == "inferior":
+            # Lado inferior - palitinhos apontam para cima
+            x_base = x_offset + self.espaco_entre_papelao_e_palitos
+            y_base = y_offset + self.altura
+            direcao = -1  # para cima
+        else:
+            return
+        
+        # Desenhar palitinhos ao longo do lado
+        for i in range(self.numero_palitos_por_lado):
+            # Calcular posição horizontal do palito
+            x_pos = x_base + (i * (self.espaco_entre_palitos + self.largura_palito))
+            
+            # Ponto inicial do palito (na borda)
+            x_inicio = x_pos
+            y_inicio = y_base
+            
+            # Ponto final do palito (apontando para o lado oposto)
+            x_fim = x_pos
+            y_fim = y_base + (direcao * self.altura_palito)
+            
+            # Desenhar o palito como um segmento de linha
+            dwg.add(dwg.line(
+                start=(x_inicio, y_inicio),
+                end=(x_fim, y_fim),
+                stroke="navy",
+                stroke_width=0.1
+            ))
 
     def draw(self, dwg, x_offset, y_offset):
+        # Desenhar o retângulo principal
         dwg.add(dwg.rect(
             insert=(x_offset, y_offset), 
             size=(self.largura, self.altura), 
@@ -25,3 +68,8 @@ class ExternalLiningCircularBaseWallComponent:
             fill="none", 
             stroke_width=0.1
         ))
+        
+        # Desenhar palitinhos apenas em dois lados não consecutivos
+        # Lado superior e lado inferior (não consecutivos)
+        self._desenhar_palitos_lado(dwg, x_offset, y_offset, "superior")
+        self._desenhar_palitos_lado(dwg, x_offset, y_offset, "inferior")
