@@ -1,53 +1,55 @@
 class CardboardBookTopComponent:
     def __init__(self, width_cm, height_cm, depth_cm, thickness_mm):
-        self.width = width_cm * 10  # convert to mm
-        self.height = height_cm * 10
-        self.depth = depth_cm * 10
-        self.thickness = thickness_mm
+        self.largura = (width_cm * 10) + 15
+        self.altura = (height_cm * 10) + 10
+        self.profundidade = depth_cm * 10
+        self.espessura = thickness_mm
         self._compute_size()
 
     def _compute_size(self):
-        self.in_between_spacing = self._get_in_between_spacing(self.thickness)
-        self.offset = 0
-        self.rect_width = self.width + 15
-        self.rect_height = self.height + 10
-        self.total_width = self.rect_width
+        self.espacamento = self._calcular_espacamento(self.espessura)
+        self.total_width = self.largura
         self.total_height = (
-            self.rect_height * 2 + self.depth + self.in_between_spacing * 2
+            self.altura + self.espacamento + self.profundidade + self.espacamento + self.altura
         )
 
-    def _get_in_between_spacing(self, thickness):
-        if 1.5 <= thickness <= 2:
+    def _calcular_espacamento(self, espessura):
+        if 1.5 <= espessura <= 2:
             return 6
         else:
             return 8
 
     def draw(self, dwg, x_offset, y_offset):
-        left_x = x_offset
-        right_x = left_x + self.rect_width
+        abcissa_esquerda = x_offset
+        abcissa_direita = abcissa_esquerda + self.largura
 
-        # First rectangle (top panel)
-        first_rect_top_y = y_offset
-        first_rect_bottom_y = first_rect_top_y + self.rect_height
+        # Tampo superior
+        coordenada_inferior_tampo_inferior = y_offset
+        coordenada_superior_tampo_inferior = coordenada_inferior_tampo_inferior + self.altura
 
-        # Middle rectangle (spine)
-        middle_rect_top_y = first_rect_bottom_y + self.in_between_spacing
-        middle_rect_bottom_y = middle_rect_top_y + self.depth
+        # Lombada
+        coordenada_inferior_lombada = coordenada_superior_tampo_inferior + self.espacamento
+        coordenada_superior_lombada = coordenada_inferior_lombada + self.profundidade
 
-        # Bottom rectangle (bottom panel)
-        bottom_rect_top_y = middle_rect_bottom_y + self.in_between_spacing
-        bottom_rect_bottom_y = bottom_rect_top_y + self.rect_height
+        # Tampo inferior
+        coordenada_inferior_tampo_superior = coordenada_superior_lombada + self.espacamento
+        coordenada_superior_tampo_superior = coordenada_inferior_tampo_superior + self.altura
 
-        # Draw three rectangles stacked vertically
-        for top_y, bottom_y in [
-            (first_rect_top_y, first_rect_bottom_y),
-            (middle_rect_top_y, middle_rect_bottom_y),
-            (bottom_rect_top_y, bottom_rect_bottom_y)
+        # Três retangulos empilhados verticalmente
+        for coordenada_superior, coordenada_inferior in [
+            (coordenada_superior_tampo_superior, coordenada_inferior_tampo_superior),
+            (coordenada_superior_lombada, coordenada_inferior_lombada),
+            (coordenada_superior_tampo_inferior, coordenada_inferior_tampo_inferior)
         ]:
-            dwg.add(dwg.polyline([
-                (left_x, top_y),
-                (right_x, top_y),
-                (right_x, bottom_y),
-                (left_x, bottom_y),
-                (left_x, top_y)
-            ], stroke="black", fill="none", stroke_width='0.1')) 
+            dwg.add(dwg.polyline(
+            [
+                (abcissa_esquerda, coordenada_superior),
+                (abcissa_direita, coordenada_superior),
+                (abcissa_direita, coordenada_inferior),
+                (abcissa_esquerda, coordenada_inferior),
+                (abcissa_esquerda, coordenada_superior)
+            ], 
+                stroke="navy", 
+                fill="none", 
+                stroke_width='0.1'
+            ))

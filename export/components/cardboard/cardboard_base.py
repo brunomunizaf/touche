@@ -1,107 +1,151 @@
-import svgwrite
-
 class CardboardBaseComponent:
     def __init__(self, width_cm, height_cm, depth_cm, thickness_mm, with_magnets=False):
-        self.width_cm = width_cm
-        self.height_cm = height_cm
-        self.depth_cm = depth_cm
-        self.thickness_mm = thickness_mm
-        self.with_magnets = with_magnets
-        self.width = width_cm * 10  # convert to mm
-        self.height = height_cm * 10
-        self.depth = depth_cm * 10
+        self.largura = width_cm * 10
+        self.altura = height_cm * 10
+        self.profundidade = depth_cm * 10
+        self.espessura = thickness_mm
+        self.incluir_imas = with_magnets
+        self.raio_do_ima = 7
         self._compute_size()
 
     def _compute_size(self):
-        self._total_width = self.width + 2 * self.depth
-        self._total_height = self.height + 2 * self.depth
+        self.total_width = self.largura + (2 * self.profundidade)
+        self.total_height = self.altura + (2 * self.profundidade)
 
-    @property
-    def total_width(self):
-        return self._total_width
-
-    @property
-    def total_height(self):
-        return self._total_height
-
-    def get_magnets_x(self, x0, x1, W):
-        if 150 <= W <= 200:
-            xL = x0 + 30
-            xR = x1 - 30
-        elif 200 < W <= 300:
-            xL = x0 + 40
-            xR = x1 - 40
+    def _calcular_abcissa_ima(self, x0, x1, largura):
+        if 150 <= largura <= 200:
+            abcissa_esquerda = x0 + 30
+            abcissa_direita = x1 - 30
+        elif 200 < largura <= 300:
+            abcissa_esquerda = x0 + 40
+            abcissa_direita = x1 - 40
         else:
-            xL = x0 + 45
-            xR = x1 - 45
-        return xL, xR
-
-    def draw_magnet(self, x, y, radius, dwg, color):
-        dwg.add(dwg.circle(
-            center=(x, y),
-            r=radius,
-            stroke=color,
-            fill="none",
-            stroke_width='0.1'
-        ))
+            abcissa_esquerda = x0 + 45
+            abcissa_direita = x1 - 45
+        return abcissa_esquerda, abcissa_direita
 
     def draw(self, dwg, x_offset, y_offset):
-        main_left_x = self.depth + x_offset
-        main_right_x = main_left_x + self.width
-        main_bottom_y = self.depth + y_offset
-        main_top_y = main_bottom_y + self.height
-        flap_left_x = main_left_x - self.depth
-        flap_right_x = main_right_x + self.depth
-        flap_bottom_y = main_bottom_y - self.depth
-        flap_top_y = main_top_y + self.depth
-        t = self.thickness_mm
+        abcissa_extrema_esquerda = x_offset
+        abcissa_esquerda = abcissa_extrema_esquerda + self.profundidade
+        abcissa_direita = abcissa_esquerda + self.largura
+        abcissa_extrema_direita = abcissa_direita + self.profundidade
 
+        coordenada_extrema_inferior = y_offset
+        coordenada_inferior = coordenada_extrema_inferior + self.profundidade
+        coordenada_superior = coordenada_inferior + self.altura        
+        coordenada_extrema_superior = coordenada_superior + self.profundidade
+
+        meia_profundidade = self.profundidade / 2
+
+        # Desenha o retângulo do meio (vinco)
         dwg.add(dwg.polyline([
-            (main_left_x, main_bottom_y),
-            (main_right_x, main_bottom_y),
-            (main_right_x, main_top_y),
-            (main_left_x, main_top_y),
-            (main_left_x, main_bottom_y)
+            (abcissa_esquerda, coordenada_inferior),
+            (abcissa_direita, coordenada_inferior),
+            (abcissa_direita, coordenada_superior),
+            (abcissa_esquerda, coordenada_superior),
+            (abcissa_esquerda, coordenada_inferior),
         ], stroke="red", fill="none", stroke_width='0.1'))
 
-        path = dwg.path(stroke="black", fill="none", stroke_width='0.1')
+        path = dwg.path(
+            stroke="black",
+            fill="none",
+            stroke_width='0.1'
+        )
 
-        path.push("M", main_left_x, main_top_y)
+        # Move para canto inferior esquerdo do retângulo do vinco
+        path.push("M", 
+            abcissa_esquerda, coordenada_inferior
+        )
 
-        path.push("L", main_left_x - t, main_top_y, main_left_x - t, main_top_y + self.depth / 2, main_left_x, main_top_y + self.depth / 2, main_left_x, flap_top_y,
-                  main_right_x, flap_top_y, main_right_x, main_top_y + self.depth / 2, main_right_x + t, main_top_y + self.depth / 2, main_right_x + t, main_top_y, main_right_x, main_top_y)
+        # Desenha a aba inferior
+        path.push("L",
+            abcissa_esquerda - self.espessura, coordenada_inferior, 
+            abcissa_esquerda - self.espessura, coordenada_inferior - meia_profundidade, 
+            abcissa_esquerda, coordenada_inferior - meia_profundidade, 
+            abcissa_esquerda, coordenada_extrema_inferior,
+            abcissa_direita, coordenada_extrema_inferior, 
+            abcissa_direita, coordenada_inferior - meia_profundidade, 
+            abcissa_direita + self.espessura, coordenada_inferior - meia_profundidade, 
+            abcissa_direita + self.espessura, coordenada_inferior,
+            abcissa_direita, coordenada_inferior
+        )
 
-        path.push("M", main_left_x, main_bottom_y)
+        # Move para canto superior esquerdo do retângulo do vinco
+        path.push("M", abcissa_esquerda, coordenada_superior)
 
-        path.push("L", main_left_x - t, main_bottom_y, main_left_x - t, main_bottom_y - self.depth / 2, main_left_x, main_bottom_y - self.depth / 2, main_left_x, flap_bottom_y,
-                  main_right_x, flap_bottom_y, main_right_x, main_bottom_y - self.depth / 2, main_right_x + t, main_bottom_y - self.depth / 2, main_right_x + t, main_bottom_y, main_right_x, main_bottom_y)
+        # Desenha a aba superior
+        path.push("L",
+            abcissa_esquerda - self.espessura, coordenada_superior, 
+            abcissa_esquerda - self.espessura, coordenada_superior + meia_profundidade, 
+            abcissa_esquerda, coordenada_superior + meia_profundidade, 
+            abcissa_esquerda, coordenada_extrema_superior,
+            abcissa_direita, coordenada_extrema_superior, 
+            abcissa_direita, coordenada_superior + meia_profundidade, 
+            abcissa_direita + self.espessura, coordenada_superior + meia_profundidade, 
+            abcissa_direita + self.espessura, coordenada_superior,
+            abcissa_direita, coordenada_superior
+        )
 
-        path.push("M", main_left_x, main_bottom_y)
+        # Move para canto inferior esquerdo do retângulo do vinco
+        path.push("M", abcissa_esquerda, coordenada_inferior)
 
-        path.push("L", main_left_x - self.depth / 2, main_bottom_y, main_left_x - self.depth / 2, main_bottom_y - t, flap_left_x, main_bottom_y - t,
-                  flap_left_x, main_top_y + t, main_left_x - self.depth / 2, main_top_y + t, main_left_x - self.depth / 2, main_top_y, main_left_x, main_top_y)
+        # Desenha a aba esquerda
+        path.push("L", 
+            abcissa_esquerda - meia_profundidade, coordenada_inferior, 
+            abcissa_esquerda - meia_profundidade, coordenada_inferior - self.espessura, 
+            abcissa_extrema_esquerda, coordenada_inferior - self.espessura,
+            abcissa_extrema_esquerda, coordenada_superior + self.espessura, 
+            abcissa_esquerda - meia_profundidade, coordenada_superior + self.espessura, 
+            abcissa_esquerda - meia_profundidade, coordenada_superior, 
+            abcissa_esquerda, coordenada_superior
+        )
 
-        path.push("M", main_right_x, main_bottom_y)
+        # Move para canto inferior direito do retângulo do vinco
+        path.push("M", abcissa_direita, coordenada_inferior)
 
-        path.push("L", flap_right_x - self.depth / 2, main_bottom_y, flap_right_x - self.depth / 2, main_bottom_y - t, flap_right_x, main_bottom_y - t,
-                  flap_right_x, main_top_y + t, flap_right_x - self.depth / 2, main_top_y + t, flap_right_x - self.depth / 2, main_top_y, main_right_x, main_top_y)
+        # Desenha a aba direita
+        path.push("L", 
+            abcissa_extrema_direita - meia_profundidade, coordenada_inferior, 
+            abcissa_extrema_direita - meia_profundidade, coordenada_inferior - self.espessura, 
+            abcissa_extrema_direita, coordenada_inferior - self.espessura,
+            abcissa_extrema_direita, coordenada_superior + self.espessura, 
+            abcissa_extrema_direita - meia_profundidade, coordenada_superior + self.espessura, 
+            abcissa_extrema_direita - meia_profundidade, coordenada_superior, 
+            abcissa_direita, coordenada_superior
+        )
 
         dwg.add(path)
 
-        # Draw magnets if requested
-        if self.with_magnets:
-            magnet_radius = 7  # 7mm radius
-            
-            # Calculate Y position based on depth
-            if self.depth >= 100:
-                yM = main_top_y + 30
+        # Desenha imãs (se necessário)
+        if self.incluir_imas:
+            if self.profundidade >= 100:
+                coordenada_media = coordenada_superior + 30
             else:
-                yM = main_top_y + (self.depth / 2)
-            
-            if self.width + 15 > 100:
-                xL, xR = self.get_magnets_x(main_left_x, main_right_x, self.width)
-                self.draw_magnet(xL, yM, magnet_radius, dwg, 'black')
-                self.draw_magnet(xR, yM, magnet_radius, dwg, 'black')
+                coordenada_media = coordenada_superior + (self.profundidade / 2)
+
+            if self.largura + 15 > 100:
+                abcissa_esquerda, abcissa_direita = self._calcular_abcissa_ima(abcissa_esquerda, abcissa_direita, self.largura)
+
+                dwg.add(dwg.circle(
+                    center=(abcissa_esquerda, coordenada_media),
+                    r = self.raio_do_ima,
+                    stroke = "black",
+                    fill = "none",
+                    stroke_width = '0.1'
+                ))
+                dwg.add(dwg.circle(
+                    center=(abcissa_direita, coordenada_media),
+                    r = self.raio_do_ima,
+                    stroke = "black",
+                    fill = "none",
+                    stroke_width = '0.1'
+                ))
             else:
-                xM = main_left_x + (main_right_x - main_left_x) / 2
-                self.draw_magnet(xM, yM, magnet_radius, dwg, 'black') 
+                abcissa_media = abcissa_esquerda + (abcissa_direita - abcissa_esquerda) / 2
+                dwg.add(dwg.circle(
+                    center=(abcissa_media, coordenada_media),
+                    r = self.raio_do_ima,
+                    stroke = "black",
+                    fill = "none",
+                    stroke_width = '0.1'
+                ))

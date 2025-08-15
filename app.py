@@ -6,41 +6,25 @@ from export.layout import BoxLayout, MultiInstanceLayout
 from export.svg_exporter import SVGExporter
 
 # Cardboard
-from export.components import CardboardBaseComponent
-from export.components import CardboardLooseTopComponent
-from export.components import CardboardBookTopComponent
-from export.components import CardboardDoubleMagnetTopComponent
-from export.components import CardboardSleeveTopComponent
-from export.components import CardboardSingleMagnetTopComponent
-from export.components import CardboardCircularTopLidComponent, CardboardCircularTopWallComponent
-from export.components import CardboardCircularBaseLidComponent, CardboardCircularBaseWallComponent
-
-# Internal Lining
-from export.components import InternalLiningLooseTopComponent
-from export.components import InternalLiningBookTopComponent
-from export.components import InternalLiningDoubleMagnetTopComponent
-from export.components import InternalLiningSleeveTopComponent
-from export.components import InternalLiningSingleMagnetTopComponent
-from export.components import InternalLiningCircularTopLidComponent, InternalLiningCircularTopWallComponent
-from export.components import InternalLiningCircularBaseLidComponent, InternalLiningCircularBaseWallComponent
-
-# Internal Lining Base
-from export.components import InternalLiningBaseForLooseTopComponent
-from export.components import InternalLiningBaseForBookTopComponent
-from export.components import InternalLiningBaseForDoubleMagnetTopComponent
-from export.components import InternalLiningBaseForSleeveTopComponent
-from export.components import InternalLiningBaseForSingleMagnetTopComponent
-
-# External Lining
-from export.components import ExternalLiningBookTopComponent
-from export.components import ExternalLiningDoubleMagnetTopComponent
-from export.components import ExternalLiningLooseTopComponent
-from export.components import ExternalLiningSleeveTopComponent
-from export.components import ExternalLiningBaseLooseComponent
-from export.components import ExternalLiningBaseNonLooseComponent
-from export.components import ExternalLiningSingleMagnetTopComponent
-from export.components import ExternalLiningCircularTopLidComponent, ExternalLiningCircularTopWallComponent
-from export.components import ExternalLiningCircularBaseLidComponent, ExternalLiningCircularBaseWallComponent
+from export.components import (
+    CardboardBaseComponent, CardboardLooseTopComponent, CardboardBookTopComponent,
+    CardboardDoubleMagnetTopComponent, CardboardSleeveTopComponent, CardboardSingleMagnetTopComponent,
+    CardboardCircularTopLidComponent, CardboardCircularTopWallComponent,
+    CardboardCircularBaseLidComponent, CardboardCircularBaseWallComponent,
+    InternalLiningBaseForLooseTopComponent, InternalLiningBaseForBookTopComponent,
+    InternalLiningBaseForDoubleMagnetTopComponent, InternalLiningBaseForSleeveTopComponent,
+    InternalLiningBaseForSingleMagnetTopComponent, InternalLiningLooseTopComponent,
+    InternalLiningBookTopComponent, InternalLiningDoubleMagnetTopComponent,
+    InternalLiningSleeveTopComponent, InternalLiningSingleMagnetTopComponent,
+    InternalLiningCircularTopWallComponent, InternalLiningCircularBaseWallComponent,
+    InternalLiningCircularTopLidComponent, InternalLiningCircularBaseLidComponent,
+    ExternalLiningBookTopComponent, ExternalLiningDoubleMagnetTopComponent,
+    ExternalLiningLooseTopComponent, ExternalLiningSleeveTopComponent,
+    ExternalLiningBaseLooseComponent, ExternalLiningBaseNonLooseComponent,
+    ExternalLiningBaseSingleMagnetComponent, ExternalLiningSingleMagnetTopComponent,
+    ExternalLiningCircularTopWallComponent, ExternalLiningCircularBaseWallComponent,
+    ExternalLiningCircularTopLidComponent, ExternalLiningCircularBaseLidComponent
+)
 
 st.set_page_config(
 	page_title="Touché"
@@ -64,40 +48,14 @@ if st.session_state['box_type'] is None:
     for i, (col, box_type, img) in enumerate(zip(cols, box_types, images)):
         with col:
             st.image(img)
-            if box_type == "Tampa Luva":
-                st.button(
-                    f"{box_type}",
-                    key=f"select_{i}",
-                    help=f"Em breve",
-                    disabled=True
-                )
-            elif box_type == "Tampa Circular":
-                button_clicked = st.button(
-                    f"{box_type}",
-                    key=f"select_{i}",
-                    help=f"Clique para selecionar {box_type}"
-                )
-                if button_clicked:
-                    st.session_state['box_type'] = box_type
-                    st.rerun()
-            elif box_type == "Tampa Imã Simples":
-                button_clicked = st.button(
-                    f"{box_type}",
-                    key=f"select_{i}",
-                    help=f"Clique para selecionar {box_type}"
-                )
-                if button_clicked:
-                    st.session_state['box_type'] = box_type
-                    st.rerun()
-            else:
-                button_clicked = st.button(
-                    f"{box_type}",
-                    key=f"select_{i}",
-                    help=f"Clique para selecionar {box_type}"
-                )
-                if button_clicked:
-                    st.session_state['box_type'] = box_type
-                    st.rerun()
+            button_clicked = st.button(
+                f"{box_type}",
+                key=f"select_{i}",
+                help=f"Clique para selecionar {box_type}"
+            )
+            if button_clicked:
+                st.session_state['box_type'] = box_type
+                st.rerun()
 else:
     box_type = st.session_state['box_type']
     st.success(f"Tipo de caixa selecionado: {box_type}")
@@ -641,7 +599,7 @@ if step == 3:
                 st.session_state['depth'],
                 thickness
             )
-            base = ExternalLiningBaseNonLooseComponent(
+            base = ExternalLiningBaseSingleMagnetComponent(
                 st.session_state['width'],
                 st.session_state['height'],
                 st.session_state['depth'],
@@ -837,7 +795,7 @@ if step == 3:
                 InternalLiningSingleMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
             ),
             "Revestimento Externo - Base + Tampa Imã Simples": lambda: (
-                ExternalLiningBaseNonLooseComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
+                ExternalLiningBaseSingleMagnetComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness']),
                 ExternalLiningSingleMagnetTopComponent(st.session_state['width'], st.session_state['height'], st.session_state['depth'], st.session_state['thickness'])
             )
         }

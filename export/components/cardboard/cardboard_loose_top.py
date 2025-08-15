@@ -2,83 +2,120 @@ import math
 
 class CardboardLooseTopComponent:
     def __init__(self, width_cm, height_cm, depth_cm, thickness_mm):
-        self.width = width_cm * 10  # convert to mm
-        self.height = height_cm * 10
-        self.depth = depth_cm * 10
-        self.thickness = thickness_mm
+        self.largura = (width_cm * 10) + self._calcular_folga(thickness_mm)
+        self.altura = (height_cm * 10) + self._calcular_folga(thickness_mm)
+        self.profundidade = self._calcular_profundidade_da_tampa(depth_cm * 10)
+        self.espessura = thickness_mm
         self._compute_size()
 
     def _compute_size(self):
-        self.clearance = self._get_clearance(self.thickness)
-        self.lid_flap_depth = self._calculate_top_depth(self.depth)
-        self.lid_width = self.width + self.clearance
-        self.lid_height = self.height + self.clearance
-        self._total_width = self.lid_width + 2 * self.lid_flap_depth
-        self._total_height = self.lid_height + 2 * self.lid_flap_depth
+        self.total_width = self.largura + (2 * self.profundidade)
+        self.total_height = self.altura + (2 * self.profundidade)
 
-    @property
-    def total_width(self):
-        return self._total_width
-
-    @property
-    def total_height(self):
-        return self._total_height
-
-    def _get_clearance(self, thickness):
-        if thickness in (1.90, 2.00):
+    def _calcular_folga(self, espessura):
+        if espessura in (1.90, 2.00):
             return 7.0
-        elif thickness == 2.50:
+        elif espessura == 2.50:
             return 8.0
         else:
-            return thickness * 3
+            return espessura * 3
 
-    def _calculate_top_depth(self, depth_mm):
-        if depth_mm <= 50:
+    def _calcular_profundidade_da_tampa(self, profundidade):
+        if profundidade <= 50:
             return 15
-        elif depth_mm <= 100:
+        elif profundidade <= 100:
             return 20
         else:
-            return 20 + 10 * math.ceil((depth_mm - 100) / 50)
+            return 20 + 10 * math.ceil((profundidade - 100) / 50)
 
     def draw(self, dwg, x_offset, y_offset):
-        main_left_x = self.lid_flap_depth + x_offset
-        main_right_x = main_left_x + self.lid_width
-        main_bottom_y = self.lid_flap_depth + y_offset
-        main_top_y = main_bottom_y + self.lid_height
-        flap_left_x = main_left_x - self.lid_flap_depth
-        flap_right_x = main_right_x + self.lid_flap_depth
-        flap_bottom_y = main_bottom_y - self.lid_flap_depth
-        flap_top_y = main_top_y + self.lid_flap_depth
-        t = self.thickness
+        abcissa_extrema_esquerda = x_offset
+        abcissa_esquerda = abcissa_extrema_esquerda + self.profundidade
+        abcissa_direita = abcissa_esquerda + self.largura
+        abcissa_extrema_direita = abcissa_direita + self.profundidade
 
+        coordenada_extrema_inferior = y_offset
+        coordenada_inferior = coordenada_extrema_inferior + self.profundidade
+        coordenada_superior = coordenada_inferior + self.altura        
+        coordenada_extrema_superior = coordenada_superior + self.profundidade
+
+        meia_profundidade = self.profundidade / 2
+
+        # Desenha o retângulo do meio (vinco)
         dwg.add(dwg.polyline([
-            (main_left_x, main_bottom_y),
-            (main_right_x, main_bottom_y),
-            (main_right_x, main_top_y),
-            (main_left_x, main_top_y),
-            (main_left_x, main_bottom_y)
+            (abcissa_esquerda, coordenada_inferior),
+            (abcissa_direita, coordenada_inferior),
+            (abcissa_direita, coordenada_superior),
+            (abcissa_esquerda, coordenada_superior),
+            (abcissa_esquerda, coordenada_inferior),
         ], stroke="red", fill="none", stroke_width='0.1'))
 
-        path = dwg.path(stroke="black", fill="none", stroke_width='0.1')
+        path = dwg.path(
+            stroke="black",
+            fill="none",
+            stroke_width='0.1'
+        )
 
-        path.push("M", main_left_x, main_top_y)
+        # Move para canto inferior esquerdo do retângulo do vinco
+        path.push("M", 
+            abcissa_esquerda, coordenada_inferior
+        )
 
-        path.push("L", main_left_x - t, main_top_y, main_left_x - t, main_top_y + self.lid_flap_depth / 2, main_left_x, main_top_y + self.lid_flap_depth / 2, main_left_x, flap_top_y,
-                  main_right_x, flap_top_y, main_right_x, main_top_y + self.lid_flap_depth / 2, main_right_x + t, main_top_y + self.lid_flap_depth / 2, main_right_x + t, main_top_y, main_right_x, main_top_y)
+        # Desenha a aba inferior
+        path.push("L",
+            abcissa_esquerda - self.espessura, coordenada_inferior, 
+            abcissa_esquerda - self.espessura, coordenada_inferior - meia_profundidade, 
+            abcissa_esquerda, coordenada_inferior - meia_profundidade, 
+            abcissa_esquerda, coordenada_extrema_inferior,
+            abcissa_direita, coordenada_extrema_inferior, 
+            abcissa_direita, coordenada_inferior - meia_profundidade, 
+            abcissa_direita + self.espessura, coordenada_inferior - meia_profundidade, 
+            abcissa_direita + self.espessura, coordenada_inferior,
+            abcissa_direita, coordenada_inferior
+        )
 
-        path.push("M", main_left_x, main_bottom_y)
+        # Move para canto superior esquerdo do retângulo do vinco
+        path.push("M", abcissa_esquerda, coordenada_superior)
 
-        path.push("L", main_left_x - t, main_bottom_y, main_left_x - t, main_bottom_y - self.lid_flap_depth / 2, main_left_x, main_bottom_y - self.lid_flap_depth / 2, main_left_x, flap_bottom_y,
-                  main_right_x, flap_bottom_y, main_right_x, main_bottom_y - self.lid_flap_depth / 2, main_right_x + t, main_bottom_y - self.lid_flap_depth / 2, main_right_x + t, main_bottom_y, main_right_x, main_bottom_y)
+        # Desenha a aba superior
+        path.push("L",
+            abcissa_esquerda - self.espessura, coordenada_superior, 
+            abcissa_esquerda - self.espessura, coordenada_superior + meia_profundidade, 
+            abcissa_esquerda, coordenada_superior + meia_profundidade, 
+            abcissa_esquerda, coordenada_extrema_superior,
+            abcissa_direita, coordenada_extrema_superior, 
+            abcissa_direita, coordenada_superior + meia_profundidade, 
+            abcissa_direita + self.espessura, coordenada_superior + meia_profundidade, 
+            abcissa_direita + self.espessura, coordenada_superior,
+            abcissa_direita, coordenada_superior
+        )
 
-        path.push("M", main_left_x, main_bottom_y)
+        # Move para canto inferior esquerdo do retângulo do vinco
+        path.push("M", abcissa_esquerda, coordenada_inferior)
 
-        path.push("L", main_left_x - self.lid_flap_depth / 2, main_bottom_y, main_left_x - self.lid_flap_depth / 2, main_bottom_y - t, flap_left_x, main_bottom_y - t,
-                  flap_left_x, main_top_y + t, main_left_x - self.lid_flap_depth / 2, main_top_y + t, main_left_x - self.lid_flap_depth / 2, main_top_y, main_left_x, main_top_y)
+        # Desenha a aba esquerda
+        path.push("L", 
+            abcissa_esquerda - meia_profundidade, coordenada_inferior, 
+            abcissa_esquerda - meia_profundidade, coordenada_inferior - self.espessura, 
+            abcissa_extrema_esquerda, coordenada_inferior - self.espessura,
+            abcissa_extrema_esquerda, coordenada_superior + self.espessura, 
+            abcissa_esquerda - meia_profundidade, coordenada_superior + self.espessura, 
+            abcissa_esquerda - meia_profundidade, coordenada_superior, 
+            abcissa_esquerda, coordenada_superior
+        )
 
-        path.push("M", main_right_x, main_bottom_y)
+        # Move para canto inferior direito do retângulo do vinco
+        path.push("M", abcissa_direita, coordenada_inferior)
 
-        path.push("L", flap_right_x - self.lid_flap_depth / 2, main_bottom_y, flap_right_x - self.lid_flap_depth / 2, main_bottom_y - t, flap_right_x, main_bottom_y - t,
-                  flap_right_x, main_top_y + t, flap_right_x - self.lid_flap_depth / 2, main_top_y + t, flap_right_x - self.lid_flap_depth / 2, main_top_y, main_right_x, main_top_y)
+        # Desenha a aba direita
+        path.push("L", 
+            abcissa_extrema_direita - meia_profundidade, coordenada_inferior, 
+            abcissa_extrema_direita - meia_profundidade, coordenada_inferior - self.espessura, 
+            abcissa_extrema_direita, coordenada_inferior - self.espessura,
+            abcissa_extrema_direita, coordenada_superior + self.espessura, 
+            abcissa_extrema_direita - meia_profundidade, coordenada_superior + self.espessura, 
+            abcissa_extrema_direita - meia_profundidade, coordenada_superior, 
+            abcissa_direita, coordenada_superior
+        )
 
-        dwg.add(path) 
+        dwg.add(path)

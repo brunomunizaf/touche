@@ -5,8 +5,8 @@ class CardboardCircularBaseLidComponent:
 
     def _compute_size(self):
         self.raio = self.diametro / 2
-        self.total_width = self.raio * 2
-        self.total_height = self.raio * 2
+        self.total_width = self.diametro
+        self.total_height = self.diametro
 
     def draw(self, dwg, x_offset, y_offset):
         centro = (x_offset + self.raio, y_offset + self.raio)
