@@ -3,7 +3,7 @@ import math
 class ExternalLiningCircularTopLidComponent:
     def __init__(self, box_diameter_cm):
         self.altura_palito = 6
-        self.espaco_entre_papelao_e_palitos = 1.05 # espessura do papelao mais fino
+        self.espaco_entre_papelao_e_palitos = 2.05 # espessura do papelao mais fino + 1 mm de sobra
         self.diametro_papelao = (box_diameter_cm * 10) + 5
         self.diametro = self.diametro_papelao + (2 * self.espaco_entre_papelao_e_palitos) + (2 * self.altura_palito)
         self._compute_size()
