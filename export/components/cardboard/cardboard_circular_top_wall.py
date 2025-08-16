@@ -6,7 +6,7 @@ class CardboardCircularTopWallComponent:
         self._compute_size()
 
     def _compute_size(self):
-        self.sobra = 2
+        self.sobra = 2.2
         self.raio = self.diametro / 2
         self.altura = 20
         self.largura = 2 * math.pi * self.raio + self.sobra
